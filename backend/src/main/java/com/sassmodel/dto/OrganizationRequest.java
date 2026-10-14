@@ -1,0 +1,36 @@
+package com.sassmodel.dto;
+
+import com.sassmodel.entity.enums.OrganizationStatus;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+import java.time.LocalDateTime;
+
+public record OrganizationRequest(
+
+        @NotBlank(message = "Name is required")
+        @Size(max = 150, message = "Name must be at most 150 characters")
+        String name,
+
+        @NotBlank(message = "Slug is required")
+        @Size(max = 100, message = "Slug must be at most 100 characters")
+        String slug,
+
+        @NotNull(message = "Status is required")
+        OrganizationStatus status,
+
+        @Email(message = "Email must be valid")
+        @Size(max = 255, message = "Email must be at most 255 characters")
+        String email,
+
+        @Size(max = 30, message = "Phone must be at most 30 characters")
+        String phone,
+
+        @Size(max = 500, message = "Address must be at most 500 characters")
+        String address,
+
+        LocalDateTime trialEndsAt
+) {
+}
