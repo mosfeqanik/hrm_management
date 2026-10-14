@@ -1,6 +1,6 @@
 # ER Diagram
 
-Generated from the JPA entities in `com.sassmodel.entity`. Tables with `organization_id` extend
+Generated from the JPA entities in `com.hrmManagement.entity`. Tables with `organization_id` extend
 `TenantEntity` and are isolated per organization. Every table also has `id`, `created_at`, `updated_at`
 (omitted below for brevity).
 
