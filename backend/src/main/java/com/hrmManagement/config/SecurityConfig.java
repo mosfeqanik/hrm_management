@@ -29,7 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  *
  * <p>Multi-tenant data scoping (restricting an {@code ORG_USER} to their own
  * {@code organization_id}) is not enforced here — that belongs with the tenant-isolation work
- * on the {@code TenantEntity} subclasses, which is deferred.
+ * on the {@code Tenant} subclasses, which is deferred.
  */
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)

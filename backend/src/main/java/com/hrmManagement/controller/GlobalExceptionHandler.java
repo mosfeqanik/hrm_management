@@ -1,6 +1,7 @@
 package com.hrmManagement.controller;
 
 import com.hrmManagement.exception.DuplicateResourceException;
+import com.hrmManagement.exception.PlanLimitExceededException;
 import com.hrmManagement.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<Map<String, Object>> handleDuplicate(DuplicateResourceException ex) {
         return errorBody(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(PlanLimitExceededException.class)
+    public ResponseEntity<Map<String, Object>> handlePlanLimit(PlanLimitExceededException ex) {
+        return errorBody(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

@@ -1,6 +1,6 @@
 package com.hrmManagement.entity;
 
-import com.hrmManagement.entity.base.TenantEntity;
+import com.hrmManagement.entity.base.Tenant;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "menu_categories", uniqueConstraints = @UniqueConstraint(columnNames = {"organization_id", "name"}))
-public class MenuCategory extends TenantEntity {
+public class MenuCategory extends Tenant {
 
     @Column(nullable = false, length = 100)
     private String name;

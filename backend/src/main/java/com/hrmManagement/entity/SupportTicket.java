@@ -1,6 +1,6 @@
 package com.hrmManagement.entity;
 
-import com.hrmManagement.entity.base.TenantEntity;
+import com.hrmManagement.entity.base.Tenant;
 import com.hrmManagement.entity.enums.TicketPriority;
 import com.hrmManagement.entity.enums.TicketStatus;
 import com.hrmManagement.entity.enums.TicketType;
@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "support_tickets", indexes = @Index(name = "idx_support_tickets_organization", columnList = "organization_id"))
-public class SupportTicket extends TenantEntity {
+public class SupportTicket extends Tenant {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by_id", nullable = false)

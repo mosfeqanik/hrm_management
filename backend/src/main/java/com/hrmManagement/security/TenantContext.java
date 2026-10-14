@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Resolves and enforces the {@code User -> Organization -> Data} isolation rule for
- * {@code TenantEntity} resources, using the {@link JwtAuthenticatedPrincipal} set by
+ * {@code Tenant} resources, using the {@link JwtAuthenticatedPrincipal} set by
  * {@code JwtAuthenticationFilter}.
  *
  * <p>{@code SUPER_ADMIN} and {@code SAAS_STAFF} are not bound to an organization and may

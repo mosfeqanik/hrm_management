@@ -1,6 +1,6 @@
 package com.hrmManagement.entity;
 
-import com.hrmManagement.entity.base.TenantEntity;
+import com.hrmManagement.entity.base.Tenant;
 import com.hrmManagement.entity.enums.SubscriptionStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "subscriptions", indexes = @Index(name = "idx_subscriptions_organization", columnList = "organization_id"))
-public class Subscription extends TenantEntity {
+public class Subscription extends Tenant {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "plan_id", nullable = false)

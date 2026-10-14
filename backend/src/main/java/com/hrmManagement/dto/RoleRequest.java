@@ -1,5 +1,6 @@
 package com.hrmManagement.dto;
 
+import com.hrmManagement.entity.enums.DataScope;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -16,6 +17,9 @@ public record RoleRequest(
 
         @Size(max = 255, message = "Description must be at most 255 characters")
         String description,
+
+        /** Optional; defaults to ORGANIZATION for org roles. */
+        DataScope dataScope,
 
         Set<Long> permissionIds
 ) {

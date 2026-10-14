@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * A "platform account" (organizationId null, or userType SUPER_ADMIN/SAAS_STAFF) may only be
  * created or modified by an existing Super Admin, preventing privilege escalation. An "org
- * account" is scoped like any other {@code TenantEntity} via {@link TenantContext}, even though
+ * account" is scoped like any other {@code Tenant} via {@link TenantContext}, even though
  * {@code User} itself carries a nullable organization rather than extending it.
  */
 @Service

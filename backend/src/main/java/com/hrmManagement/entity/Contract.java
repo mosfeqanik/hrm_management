@@ -1,6 +1,6 @@
 package com.hrmManagement.entity;
 
-import com.hrmManagement.entity.base.TenantEntity;
+import com.hrmManagement.entity.base.Tenant;
 import com.hrmManagement.entity.enums.ContractStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "contracts", indexes = @Index(name = "idx_contracts_organization", columnList = "organization_id"))
-public class Contract extends TenantEntity {
+public class Contract extends Tenant {
 
     @Column(nullable = false, length = 200)
     private String title;

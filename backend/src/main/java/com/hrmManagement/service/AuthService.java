@@ -4,6 +4,7 @@ import com.hrmManagement.config.JwtProperties;
 import com.hrmManagement.dto.LoginRequest;
 import com.hrmManagement.dto.LoginResponse;
 import com.hrmManagement.entity.User;
+import com.hrmManagement.repository.EmployeeRepository;
 import com.hrmManagement.repository.UserRepository;
 import com.hrmManagement.security.CustomUserDetails;
 import com.hrmManagement.security.JwtService;
@@ -23,6 +24,7 @@ public class AuthService {
     private static final String INVALID_CREDENTIALS_MESSAGE = "Invalid email or password";
 
     private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
@@ -42,7 +44,8 @@ public class AuthService {
 
         user.setLastLoginAt(LocalDateTime.now());
 
-        CustomUserDetails principal = CustomUserDetails.fromUser(user);
+        CustomUserDetails principal = CustomUserDetails.fromUser(user,
+                employeeRepository.findByUserId(user.getId()).orElse(null));
         String token = jwtService.generateToken(principal);
 
         return new LoginResponse(

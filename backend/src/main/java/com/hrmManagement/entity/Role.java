@@ -1,6 +1,7 @@
 package com.hrmManagement.entity;
 
 import com.hrmManagement.entity.base.BaseEntity;
+import com.hrmManagement.entity.enums.DataScope;
 import com.hrmManagement.entity.enums.RoleScope;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -32,6 +33,11 @@ public class Role extends BaseEntity {
     @Column(nullable = false, length = 30)
     private RoleScope scope;
 
+    /** Null on legacy rows: platform roles then act as PLATFORM, organization roles as ORGANIZATION. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_scope", length = 30)
+    private DataScope dataScope;
+
     @Column(name = "is_system", nullable = false)
     private boolean system = false;
 
@@ -41,4 +47,11 @@ public class Role extends BaseEntity {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private Set<Permission> permissions = new HashSet<>();
+
+    public DataScope effectiveDataScope() {
+        if (dataScope != null) {
+            return dataScope;
+        }
+        return scope == RoleScope.PLATFORM ? DataScope.PLATFORM : DataScope.ORGANIZATION;
+    }
 }

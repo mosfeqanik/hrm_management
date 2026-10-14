@@ -3,7 +3,8 @@ package com.hrmManagement.entity.enums;
 public enum SubscriptionStatus {
     TRIAL,
     ACTIVE,
-    PAST_DUE,
+    PAYMENT_FAILED,
+    GRACE_PERIOD,
     CANCELLED,
     EXPIRED,
     SUSPENDED

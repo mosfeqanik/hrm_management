@@ -16,7 +16,8 @@ public final class SubscriptionPlanMapper {
                 plan.getPrice(),
                 plan.getCurrency(),
                 plan.getBillingCycle(),
-                plan.getMaxUsers(),
+                plan.getMaxEmployees(),
+                plan.getMaxBranches(),
                 plan.getFeatures(),
                 plan.getTrialDays(),
                 plan.isActive()

@@ -23,7 +23,7 @@ import java.util.Set;
 
 /**
  * A platform (built-in) role has {@code organizationId == null} and may only be managed by the
- * Super Admin; an org custom role is scoped like a {@code TenantEntity} via
+ * Super Admin; an org custom role is scoped like a {@code Tenant} via
  * {@link TenantContext}. Every {@code ORG_USER} can also read platform roles, since those are
  * the built-ins available to assign within their own organization. {@code system} roles (the
  * seeded Super Admin role) can never be edited or deleted through the API.
@@ -78,6 +78,7 @@ public class RoleService {
 
         role.setName(request.name());
         role.setDescription(request.description());
+        role.setDataScope(request.dataScope());
         role.setSystem(false);
         role.setPermissions(resolvePermissions(request.permissionIds()));
 
@@ -110,6 +111,9 @@ public class RoleService {
 
         role.setName(request.name());
         role.setDescription(request.description());
+        if (request.dataScope() != null) {
+            role.setDataScope(request.dataScope());
+        }
         if (request.permissionIds() != null) {
             role.setPermissions(resolvePermissions(request.permissionIds()));
         }

@@ -2,12 +2,15 @@ package com.hrmManagement.entity;
 
 import com.hrmManagement.entity.base.BaseEntity;
 import com.hrmManagement.entity.enums.BillingCycle;
+import com.hrmManagement.entity.enums.PlanFeature;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,19 +29,25 @@ public class SubscriptionPlan extends BaseEntity {
     private BigDecimal price;
 
     @Column(nullable = false, length = 3)
-    private String currency = "USD";
+    private String currency = "BDT";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "billing_cycle", nullable = false, length = 30)
     private BillingCycle billingCycle;
 
-    /** Null means unlimited users. */
-    @Column(name = "max_users")
-    private Integer maxUsers;
+    /** Null means unlimited employees. */
+    @Column(name = "max_employees")
+    private Integer maxEmployees;
 
-    /** JSON or comma-separated feature list. */
-    @Column(columnDefinition = "text")
-    private String features;
+    /** Null means unlimited branches. */
+    @Column(name = "max_branches")
+    private Integer maxBranches;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "subscription_plan_features", joinColumns = @JoinColumn(name = "plan_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "feature", nullable = false, length = 30)
+    private Set<PlanFeature> features = new HashSet<>();
 
     @Column(name = "trial_days", nullable = false)
     private int trialDays = 0;

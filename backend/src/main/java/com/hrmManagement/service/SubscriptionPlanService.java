@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -66,10 +67,11 @@ public class SubscriptionPlanService {
         plan.setName(request.name());
         plan.setDescription(request.description());
         plan.setPrice(request.price());
-        plan.setCurrency(request.currency() != null ? request.currency().toUpperCase() : "USD");
+        plan.setCurrency(request.currency() != null ? request.currency().toUpperCase() : "BDT");
         plan.setBillingCycle(request.billingCycle());
-        plan.setMaxUsers(request.maxUsers());
-        plan.setFeatures(request.features());
+        plan.setMaxEmployees(request.maxEmployees());
+        plan.setMaxBranches(request.maxBranches());
+        plan.setFeatures(request.features() != null ? new HashSet<>(request.features()) : new HashSet<>());
         plan.setTrialDays(request.trialDays() != null ? request.trialDays() : 0);
         plan.setActive(request.active() == null || request.active());
     }

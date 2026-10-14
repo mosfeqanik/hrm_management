@@ -1,5 +1,6 @@
 package com.hrmManagement.security;
 
+import com.hrmManagement.repository.EmployeeRepository;
 import com.hrmManagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,12 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmailFetchingRolesAndPermissions(email)
-                .map(CustomUserDetails::fromUser)
+                .map(user -> CustomUserDetails.fromUser(user,
+                        employeeRepository.findByUserId(user.getId()).orElse(null)))
                 .orElseThrow(() -> new UsernameNotFoundException("No user with email " + email));
     }
 }

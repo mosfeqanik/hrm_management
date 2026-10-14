@@ -2,6 +2,8 @@ package com.hrmManagement.security;
 
 import com.hrmManagement.entity.Permission;
 import com.hrmManagement.entity.Role;
+import com.hrmManagement.entity.Employee;
+import com.hrmManagement.entity.enums.DataScope;
 import com.hrmManagement.entity.User;
 import com.hrmManagement.entity.enums.UserType;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,8 +36,11 @@ public class CustomUserDetails implements UserDetails {
     private final Long organizationId;
     private final boolean active;
     private final Set<GrantedAuthority> authorities;
+    private final Long employeeId;
+    private final Long branchId;
+    private final DataScope dataScope;
 
-    private CustomUserDetails(User user) {
+    private CustomUserDetails(User user, Employee employee) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.passwordHash = user.getPasswordHash();
@@ -46,10 +51,25 @@ public class CustomUserDetails implements UserDetails {
         this.organizationId = user.getOrganization() != null ? user.getOrganization().getId() : null;
         this.active = user.isActive();
         this.authorities = buildAuthorities(user.getRoles());
+        this.employeeId = employee != null ? employee.getId() : null;
+        this.branchId = employee != null && employee.getBranch() != null ? employee.getBranch().getId() : null;
+        this.dataScope = widestScope(user);
     }
 
-    public static CustomUserDetails fromUser(User user) {
-        return new CustomUserDetails(user);
+    /** {@code employee} is the user's employee record, or null for users without one (e.g. SaaS staff). */
+    public static CustomUserDetails fromUser(User user, Employee employee) {
+        return new CustomUserDetails(user, employee);
+    }
+
+    /** Platform users are always PLATFORM; otherwise the widest scope among the user's roles. */
+    private static DataScope widestScope(User user) {
+        if (user.getUserType() != UserType.ORG_USER) {
+            return DataScope.PLATFORM;
+        }
+        return user.getRoles().stream()
+                .map(Role::effectiveDataScope)
+                .reduce(DataScope::widest)
+                .orElse(DataScope.SELF);
     }
 
     private static Set<GrantedAuthority> buildAuthorities(Set<Role> roles) {
@@ -79,6 +99,18 @@ public class CustomUserDetails implements UserDetails {
 
     public UserType getUserType() {
         return userType;
+    }
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public Long getBranchId() {
+        return branchId;
+    }
+
+    public DataScope getDataScope() {
+        return dataScope;
     }
 
     public Long getOrganizationId() {

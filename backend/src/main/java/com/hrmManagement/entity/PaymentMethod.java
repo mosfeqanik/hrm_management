@@ -1,6 +1,6 @@
 package com.hrmManagement.entity;
 
-import com.hrmManagement.entity.base.TenantEntity;
+import com.hrmManagement.entity.base.Tenant;
 import com.hrmManagement.entity.enums.PaymentMethodType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "payment_methods")
-public class PaymentMethod extends TenantEntity {
+public class PaymentMethod extends Tenant {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

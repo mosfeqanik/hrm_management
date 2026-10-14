@@ -1,7 +1,7 @@
 # ER Diagram
 
 Generated from the JPA entities in `com.hrmManagement.entity`. Tables with `organization_id` extend
-`TenantEntity` and are isolated per organization. Every table also has `id`, `created_at`, `updated_at`
+`Tenant` and are isolated per organization. Every table also has `id`, `created_at`, `updated_at`
 (omitted below for brevity).
 
 ```mermaid
@@ -325,7 +325,7 @@ Everything else has an independent lifecycle (no cascade).
 
 ## Tenant isolation
 
-**Non-null `organization_id`** (extend `TenantEntity`):
+**Non-null `organization_id`** (extend `Tenant`):
 `SUBSCRIPTIONS`, `INVOICES`, `PAYMENTS`, `RECEIPTS`, `PAYMENT_METHODS`, `SUPPORT_TICKETS`,
 `EMPLOYEES`, `MENU_CATEGORIES`, `MENU_ITEMS`, `MENU_IMAGES`, `CONTRACTS`, `ORGANIZATION_SETTINGS`, `NOTIFICATIONS`.
 

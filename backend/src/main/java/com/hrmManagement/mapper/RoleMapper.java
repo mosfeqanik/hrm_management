@@ -17,6 +17,7 @@ public final class RoleMapper {
                 role.getName(),
                 role.getDescription(),
                 role.getScope(),
+                role.effectiveDataScope(),
                 role.isSystem(),
                 role.getPermissions().stream()
                         .map(PermissionMapper::toResponse)

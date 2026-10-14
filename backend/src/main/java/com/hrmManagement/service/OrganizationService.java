@@ -28,6 +28,7 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
+    private final OrgRoleProvisioner roleProvisioner;
 
     public List<OrganizationResponse> listAll() {
         TenantContext.requirePlatformStaff();
@@ -52,7 +53,9 @@ public class OrganizationService {
 
         Organization organization = new Organization();
         applyRequest(organization, request);
-        return OrganizationMapper.toResponse(organizationRepository.save(organization));
+        Organization saved = organizationRepository.save(organization);
+        roleProvisioner.provision(saved);
+        return OrganizationMapper.toResponse(saved);
     }
 
     @Transactional
@@ -76,6 +79,7 @@ public class OrganizationService {
         User owner = userRepository.findById(ownerUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + ownerUserId));
         organization.setOwner(owner);
+        roleProvisioner.grantOwnerRole(organization, owner);
         return OrganizationMapper.toResponse(organization);
     }
 

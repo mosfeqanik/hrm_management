@@ -1,6 +1,7 @@
 package com.hrmManagement.dto;
 
 import com.hrmManagement.entity.enums.BillingCycle;
+import com.hrmManagement.entity.enums.PlanFeature;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 public record SubscriptionPlanRequest(
 
@@ -29,10 +31,13 @@ public record SubscriptionPlanRequest(
         @NotNull(message = "Billing cycle is required")
         BillingCycle billingCycle,
 
-        @Positive(message = "Max users must be positive")
-        Integer maxUsers,
+        @Positive(message = "Max employees must be positive")
+        Integer maxEmployees,
 
-        String features,
+        @Positive(message = "Max branches must be positive")
+        Integer maxBranches,
+
+        Set<PlanFeature> features,
 
         @PositiveOrZero(message = "Trial days must not be negative")
         Integer trialDays,

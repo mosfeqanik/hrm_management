@@ -1,5 +1,6 @@
 package com.hrmManagement.security;
 
+import com.hrmManagement.entity.enums.DataScope;
 import com.hrmManagement.entity.enums.UserType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -67,13 +68,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = claims.getSubject();
         UserType userType = UserType.valueOf(claims.get("userType", String.class));
         Long organizationId = claims.get("organizationId", Long.class);
+        Long employeeId = claims.get("employeeId", Long.class);
+        Long branchId = claims.get("branchId", Long.class);
+        String scopeClaim = claims.get("dataScope", String.class);
+        DataScope dataScope = scopeClaim != null ? DataScope.valueOf(scopeClaim) : DataScope.ORGANIZATION;
 
         List<String> authorityClaims = claims.get("authorities", List.class);
         List<GrantedAuthority> authorities = authorityClaims == null
                 ? List.of()
                 : authorityClaims.stream().<GrantedAuthority>map(SimpleGrantedAuthority::new).toList();
 
-        JwtAuthenticatedPrincipal principal = new JwtAuthenticatedPrincipal(userId, email, userType, organizationId);
+        JwtAuthenticatedPrincipal principal = new JwtAuthenticatedPrincipal(userId, email, userType, organizationId,
+                employeeId, branchId, dataScope);
 
         var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
