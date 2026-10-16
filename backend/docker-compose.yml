@@ -2,6 +2,8 @@ services:
   app:
     build: .
     container_name: hrm-management-api
+    networks:
+      - hrm-net
     ports:
       - "8080:8080"
     environment:
@@ -11,3 +13,6 @@ services:
       SEED_ENABLED: ${SEED_ENABLED:-true}
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@hrmmanagement.local}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-ChangeMe123!}
+
+networks:
+  hrm-net:

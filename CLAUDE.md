@@ -4,7 +4,7 @@ I am learning English. In every reply, including replies to slash commands such 
 
 # Project
 
-HRM / workforce management multi-tenant SaaS. Spring Boot API in `backend/`; `frontend/` and `mobile_app/` are not built yet.
+HRM / workforce management multi-tenant SaaS. Spring Boot API in `backend/`; React web app in `frontend/`; `mobile_app/` is not built yet.
 Deeper backend notes (entities, access model, conventions): [backend/CLAUDE.md](backend/CLAUDE.md). ER diagram: [backend/docs/er-diagram.md](backend/docs/er-diagram.md).
 
 ## Run commands
@@ -38,3 +38,21 @@ docker compose down
 
 - Never commit or print `backend/.env` (it holds the real Neon credentials and JWT secret).
 - `backend/CLAUDE.md` still says only the entity layer exists; controllers, services, DTOs and repositories are now built.
+
+## Frontend (`frontend/`)
+
+Vite + React + TypeScript, FreeDash admin template (Bootstrap 5 CSS in `public/template`, `react-feather` icons; no Tailwind), React Router, TanStack Query, React Hook Form + Zod, axios. Node 22+.
+
+```bash
+# from frontend/
+npm install
+npm run dev        # http://localhost:5173, proxies /api -> http://localhost:8080 (the backend has no CORS config)
+npm run build      # tsc -b && vite build
+
+# Docker: start the backend compose first (it creates the backend_hrm-net network), then:
+docker compose up --build -d   # http://localhost:3000, nginx serves the SPA and proxies /api to http://app:8080
+```
+
+- Token is kept in localStorage; `src/auth/AuthContext.tsx` decodes the JWT claims (`authorities`, `dataScope`, ...). `<Can permission="EMPLOYEE_CREATE">` and the sidebar only hide UI; the backend enforces access.
+- `SUPER_ADMIN` / `SAAS_STAFF` hold no HR permissions (spec section 29), so they get 403 on `/api/employees`. The sidebar shows Organizations and Users to SaaS-side users and the HR modules to org users (filtered by permission). To see the HR screens: sign in as SUPER_ADMIN, create an organization and a user for it (Users page), set that user as owner (Organizations > Owner), then sign in as that user.
+- Built so far: login, app shell, and screens for Organizations and Users (platform side), and for Employees, Branches, Departments, Attendance (list + manual records; mobile check-in/out is not in the web app), Leave (requests with apply/approve/reject/cancel, balances, types), Shifts (roster + shifts), Payroll (runs: generate/finalize/pay/delete, payslips with adjustments) and Assets (assets, assignments with return, employee documents). Pattern: `crud()` in `src/api/crud.ts`, `useResource` for lists, `DataTable`/`Tabs`/`Modal` in `src/components/ui.tsx`. API types in `src/api/types.ts` are hand-written from the DTOs.
