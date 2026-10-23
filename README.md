@@ -1,4 +1,4 @@
-# hrm_management
+# mindHR
 
 Multi-tenant SaaS for HR / workforce management. One SaaS company (Super Admin + SaaS staff) sells to many client
 organizations; each organization is an isolated tenant with branches, employees, attendance, leave and payroll.
@@ -19,7 +19,7 @@ JWT_SECRET=<base64 secret>
 # optional
 JWT_EXPIRATION_MS=3600000
 SEED_ENABLED=true
-SEED_ADMIN_EMAIL=admin@hrmmanagement.local
+SEED_ADMIN_EMAIL=admin@mindhr.local
 SEED_ADMIN_PASSWORD=ChangeMe123!
 ```
 
@@ -43,7 +43,7 @@ after you log in.
 
 - **Swagger UI:** http://localhost:8080/swagger-ui.html (OpenAPI JSON at `/v3/api-docs`). Call `POST /api/auth/login`,
   click **Authorize**, and paste the token yourself.
-- **Postman:** import `backend/postman/hrm_management.postman_collection.json` (214 requests, one folder per controller).
+- **Postman:** import `backend/postman/mindhr.postman_collection.json` (214 requests, one folder per controller).
   Run `POST /api/auth/login`, then paste the token into the collection variable `token`. Nothing saves it automatically.
   Regenerate after API changes with `python postman/generate_postman.py` (from `backend/`).
 

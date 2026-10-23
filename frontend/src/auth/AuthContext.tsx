@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { TOKEN_KEY } from '../api/client'
+import { getActiveOrgId, setActiveOrgId } from '../api/orgScope'
 import type { UserType } from '../api/types'
 
 /** Claims set by the backend JwtService. */
@@ -16,7 +18,7 @@ export interface Session {
   expiresAt: number
 }
 
-const NAME_KEY = 'hrm.fullName'
+const NAME_KEY = 'mindhr.fullName'
 
 function decode(token: string | null): Session | null {
   if (!token) return null
@@ -48,35 +50,60 @@ interface AuthValue {
   signIn: (token: string, fullName: string) => void
   signOut: () => void
   can: (permission: string) => boolean
+  /** SaaS-side user (SUPER_ADMIN / SAAS_STAFF), not bound to one organization. */
+  isPlatform: boolean
+  /** Organization a platform user is working in (top bar picker); an org user's own organization. */
+  orgId: number | null
+  setOrgId: (id: number | null) => void
 }
 
 const AuthContext = createContext<AuthValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const qc = useQueryClient()
   const [session, setSession] = useState<Session | null>(() => decode(localStorage.getItem(TOKEN_KEY)))
+  const [pickedOrgId, setPickedOrgId] = useState<number | null>(getActiveOrgId)
 
-  const signIn = useCallback((token: string, fullName: string) => {
-    localStorage.setItem(TOKEN_KEY, token)
-    localStorage.setItem(NAME_KEY, fullName)
-    setSession(decode(token))
-  }, [])
+  const setOrgId = useCallback(
+    (id: number | null) => {
+      setActiveOrgId(id)
+      setPickedOrgId(id)
+      // Query keys do not include the organization, so drop everything cached for the old one.
+      qc.removeQueries()
+    },
+    [qc],
+  )
+
+  const signIn = useCallback(
+    (token: string, fullName: string) => {
+      localStorage.setItem(TOKEN_KEY, token)
+      localStorage.setItem(NAME_KEY, fullName)
+      setOrgId(null)
+      setSession(decode(token))
+    },
+    [setOrgId],
+  )
 
   const signOut = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(NAME_KEY)
+    setOrgId(null)
     setSession(null)
-  }, [])
+  }, [setOrgId])
 
-  const value = useMemo<AuthValue>(
-    () => ({
+  const value = useMemo<AuthValue>(() => {
+    const isPlatform = session != null && session.userType !== 'ORG_USER'
+    return {
       session,
       signIn,
       signOut,
       // UI hint only; the backend enforces @PreAuthorize on every call.
       can: (permission) => session?.authorities.includes(permission) ?? false,
-    }),
-    [session, signIn, signOut],
-  )
+      isPlatform,
+      orgId: isPlatform ? pickedOrgId : (session?.organizationId ?? null),
+      setOrgId,
+    }
+  }, [session, signIn, signOut, pickedOrgId, setOrgId])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

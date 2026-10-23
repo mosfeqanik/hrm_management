@@ -1,9 +1,9 @@
 services:
   app:
     build: .
-    container_name: hrm-management-api
+    container_name: mindhr-api
     networks:
-      - hrm-net
+      - mindhr-net
     ports:
       - "8080:8080"
     environment:
@@ -11,8 +11,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-3600000}
       SEED_ENABLED: ${SEED_ENABLED:-true}
-      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@hrmmanagement.local}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@mindhr.local}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-ChangeMe123!}
 
 networks:
-  hrm-net:
+  mindhr-net:

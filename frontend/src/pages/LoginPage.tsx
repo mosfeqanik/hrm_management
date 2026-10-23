@@ -54,7 +54,7 @@ export default function LoginPage() {
           <div className="col-lg-5 col-md-7 bg-white">
             <div className="p-3">
               <div className="text-center">
-                <img src="/template/images/big/icon.png" alt="HRM Management" />
+                <img src="/template/images/big/icon.png" alt="mindHR" />
               </div>
               <h2 className="mt-3 text-center">Sign In</h2>
               <p className="text-center">Enter your email address and password to access the admin panel.</p>

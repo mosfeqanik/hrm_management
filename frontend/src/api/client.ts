@@ -1,6 +1,7 @@
 import axios from 'axios'
+import { withActiveOrg } from './orgScope'
 
-export const TOKEN_KEY = 'hrm.token'
+export const TOKEN_KEY = 'mindhr.token'
 
 // Empty base URL = same-origin "/api" (Vite proxy in dev, nginx in Docker).
 export const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL ?? '' })
@@ -8,7 +9,7 @@ export const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL ?? 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY)
   if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
+  return withActiveOrg(config)
 })
 
 api.interceptors.response.use(

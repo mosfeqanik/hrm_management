@@ -1,15 +1,15 @@
 services:
   web:
     build: .
-    container_name: hrm-management-web
+    container_name: mindhr-web
     ports:
       - "3000:80"
     networks:
-      - hrm-net
+      - mindhr-net
 
 # Shared with backend/docker-compose.yml so nginx can reach http://app:8080.
 # Start the backend first (it creates the network).
 networks:
-  hrm-net:
+  mindhr-net:
     external: true
-    name: backend_hrm-net
+    name: backend_mindhr-net

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate hrm_management.postman_collection.json from the controllers and request DTOs.
+"""Regenerate mindhr.postman_collection.json from the controllers and request DTOs.
 
 Run from backend/:  python postman/generate_postman.py
 The collection holds no token: log in via POST /api/auth/login, then paste the JWT into the
@@ -9,8 +9,8 @@ import json
 import pathlib
 import re
 
-SRC = pathlib.Path("src/main/java/com/hrmManagement")
-OUT = pathlib.Path("postman/hrm_management.postman_collection.json")
+SRC = pathlib.Path("src/main/java/com/mindhr")
+OUT = pathlib.Path("postman/mindhr.postman_collection.json")
 HTTP = {"Get": "GET", "Post": "POST", "Put": "PUT", "Patch": "PATCH", "Delete": "DELETE"}
 
 
@@ -188,7 +188,7 @@ def build():
 folders, count = build()
 collection = {
     "info": {
-        "name": "HRM Management API",
+        "name": "mindHR API",
         "description": ("Generated from the Spring controllers (postman/generate_postman.py). "
                         "1) Run Auth > POST /api/auth/login. 2) Copy the token from the response and paste it into "
                         "the collection variable `token`. Every other request sends it as a Bearer token. "

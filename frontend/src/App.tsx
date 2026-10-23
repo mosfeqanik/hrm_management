@@ -14,6 +14,12 @@ import PayrollRunPage from './pages/payroll/PayrollRunPage'
 import AssetsPage from './pages/assets/AssetsPage'
 import OrganizationsPage from './pages/platform/OrganizationsPage'
 import UsersPage from './pages/platform/UsersPage'
+import SubscriptionPlansPage from './pages/platform/SubscriptionPlansPage'
+import SubscriptionsPage from './pages/platform/SubscriptionsPage'
+import BillingPage from './pages/platform/BillingPage'
+import ContractsPage from './pages/platform/ContractsPage'
+import SupportTicketsPage from './pages/platform/SupportTicketsPage'
+import SystemSettingsPage from './pages/platform/SystemSettingsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
@@ -25,6 +31,12 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="organizations" element={<OrganizationsPage />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="plans" element={<SubscriptionPlansPage />} />
+          <Route path="system-settings" element={<SystemSettingsPage />} />
+          <Route path="subscriptions" element={<SubscriptionsPage />} />
+          <Route path="billing" element={<BillingPage />} />
+          <Route path="contracts" element={<ContractsPage />} />
+          <Route path="support-tickets" element={<SupportTicketsPage />} />
           <Route path="employees" element={<EmployeesPage />} />
           <Route path="branches" element={<BranchesPage />} />
           <Route path="departments" element={<DepartmentsPage />} />

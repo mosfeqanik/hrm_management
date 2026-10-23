@@ -12,7 +12,7 @@ ER diagram: [docs/er-diagram.md](docs/er-diagram.md).
 - Lombok (`@Getter @Setter @NoArgsConstructor`; never `@Data` on entities)
 - Maven wrapper: `./mvnw compile`, `./mvnw test`, `./mvnw spring-boot:run`
 
-## Package layout (`com.hrmManagement`)
+## Package layout (`com.mindhr`)
 
 ```
 controller/   REST controllers            (empty — not yet built)

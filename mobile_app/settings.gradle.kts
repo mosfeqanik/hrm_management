@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "hrm_mobile"
+rootProject.name = "mindhr_mobile"
 include(":app")

@@ -1,45 +1,126 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Briefcase, Box, Calendar, ChevronDown, Clock, DollarSign, Globe, Grid, Home, MapPin, Power, User, Users } from 'react-feather'
+import {
+  Briefcase,
+  Box,
+  Calendar,
+  ChevronDown,
+  Clock,
+  CreditCard,
+  DollarSign,
+  FileText,
+  Globe,
+  Grid,
+  Home,
+  Layers,
+  LifeBuoy,
+  MapPin,
+  Power,
+  Repeat,
+  Settings,
+  User,
+  Users,
+} from 'react-feather'
 import type { ComponentType } from 'react'
+import { organizationsApi } from '../api/platform'
 import { useAuth } from '../auth/AuthContext'
+import { PageHeader } from '../components/ui'
+
+type Section = 'platform' | 'account' | 'modules'
 
 interface NavItem {
   to: string
   label: string
   icon: ComponentType<{ className?: string }>
+  section?: Section
   permission?: string
-  /** Shown to SaaS-side users (SUPER_ADMIN / SAAS_STAFF) only. */
-  platform?: boolean
-  ready: boolean
+  /** Platform users must pick an organization in the top bar before opening it. */
+  orgScoped?: boolean
+  superAdminOnly?: boolean
 }
 
-// Sidebar entries are filtered by the user's authorities (backend permission = MODULE_VIEW).
+// 'platform' and 'account' entries are for SaaS-side users (SUPER_ADMIN / SAAS_STAFF);
+// 'modules' entries are filtered by the user's authorities (backend permission = MODULE_VIEW).
 const NAV: NavItem[] = [
-  { to: '/', label: 'Dashboard', icon: Home, ready: true },
-  { to: '/organizations', label: 'Organizations', icon: Globe, platform: true, ready: true },
-  { to: '/users', label: 'Users', icon: User, platform: true, ready: true },
-  { to: '/employees', label: 'Employees', icon: Users, permission: 'EMPLOYEE_VIEW', ready: true },
-  { to: '/branches', label: 'Branches', icon: MapPin, permission: 'BRANCH_VIEW', ready: true },
-  { to: '/departments', label: 'Departments', icon: Grid, permission: 'DEPARTMENT_VIEW', ready: true },
-  { to: '/attendance', label: 'Attendance', icon: Clock, permission: 'ATTENDANCE_VIEW', ready: true },
-  { to: '/shifts', label: 'Shifts', icon: Calendar, permission: 'SHIFT_VIEW', ready: true },
-  { to: '/leave', label: 'Leave', icon: Briefcase, permission: 'LEAVE_VIEW', ready: true },
-  { to: '/payroll', label: 'Payroll', icon: DollarSign, permission: 'PAYROLL_VIEW', ready: true },
-  { to: '/assets', label: 'Assets', icon: Box, permission: 'ASSET_VIEW', ready: true },
+  { to: '/', label: 'Dashboard', icon: Home },
+  { to: '/organizations', label: 'Organizations', icon: Globe, section: 'platform' },
+  { to: '/users', label: 'Users', icon: User, section: 'platform' },
+  { to: '/plans', label: 'Subscription Plans', icon: Layers, section: 'platform' },
+  { to: '/system-settings', label: 'System Settings', icon: Settings, section: 'platform', superAdminOnly: true },
+  { to: '/subscriptions', label: 'Subscriptions', icon: Repeat, section: 'account', orgScoped: true },
+  { to: '/billing', label: 'Billing', icon: CreditCard, section: 'account', orgScoped: true },
+  { to: '/contracts', label: 'Contracts', icon: FileText, section: 'account', orgScoped: true },
+  { to: '/support-tickets', label: 'Support Tickets', icon: LifeBuoy, section: 'account', orgScoped: true },
+  { to: '/employees', label: 'Employees', icon: Users, section: 'modules', permission: 'EMPLOYEE_VIEW', orgScoped: true },
+  { to: '/branches', label: 'Branches', icon: MapPin, section: 'modules', permission: 'BRANCH_VIEW', orgScoped: true },
+  { to: '/departments', label: 'Departments', icon: Grid, section: 'modules', permission: 'DEPARTMENT_VIEW', orgScoped: true },
+  { to: '/attendance', label: 'Attendance', icon: Clock, section: 'modules', permission: 'ATTENDANCE_VIEW', orgScoped: true },
+  { to: '/shifts', label: 'Shifts', icon: Calendar, section: 'modules', permission: 'SHIFT_VIEW', orgScoped: true },
+  { to: '/leave', label: 'Leave', icon: Briefcase, section: 'modules', permission: 'LEAVE_VIEW', orgScoped: true },
+  { to: '/payroll', label: 'Payroll', icon: DollarSign, section: 'modules', permission: 'PAYROLL_VIEW', orgScoped: true },
+  { to: '/assets', label: 'Assets', icon: Box, section: 'modules', permission: 'ASSET_VIEW', orgScoped: true },
 ]
 
+const SECTION_TITLES: Record<Section, string> = { platform: 'Platform', account: 'Client account', modules: 'HR modules' }
+
+/** Top bar picker: which organization a platform user is working in. */
+function OrgPicker() {
+  const { orgId, setOrgId } = useAuth()
+  const { data } = useQuery({ queryKey: ['organizations', null], queryFn: () => organizationsApi.list() })
+  return (
+    <select
+      className="form-select form-select-sm"
+      style={{ minWidth: 220 }}
+      aria-label="Organization"
+      value={orgId ?? ''}
+      onChange={(e) => setOrgId(e.target.value ? Number(e.target.value) : null)}
+    >
+      <option value="">Select organization...</option>
+      {(data ?? []).map((o) => (
+        <option key={o.id} value={o.id}>
+          {o.name}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+function OrgRequired() {
+  return (
+    <>
+      <PageHeader title="Select an organization" />
+      <div className="container-fluid">
+        <div className="card">
+          <div className="card-body text-muted">
+            This page shows one organization's data. Pick the organization in the top bar first.
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 export function AppShell() {
-  const { session, signOut, can } = useAuth()
+  const { session, signOut, can, isPlatform, orgId } = useAuth()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false) // mobile only
   const [navOpen, setNavOpen] = useState(false) // mobile topbar collapse
   const [userMenu, setUserMenu] = useState(false)
-  const isPlatform = session?.userType !== 'ORG_USER'
-  const items = NAV.filter((n) => (n.platform ? isPlatform : !n.permission || can(n.permission)))
-  const platformItems = items.filter((n) => n.platform)
-  const moduleItems = items.filter((n) => !n.platform && n.to !== '/')
+  const isSuperAdmin = session?.userType === 'SUPER_ADMIN'
   const isActive = (to: string) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to))
+
+  const visible = (n: NavItem) => {
+    if (n.section === 'platform' || n.section === 'account') return isPlatform && (!n.superAdminOnly || isSuperAdmin)
+    return !n.permission || can(n.permission)
+  }
+  const items = NAV.filter(visible)
+  const sections = (['platform', 'account', 'modules'] as const)
+    .map((s) => ({ key: s, items: items.filter((n) => n.section === s) }))
+    .filter((s) => s.items.length > 0)
+
+  const current = NAV.find((n) => n.to !== '/' && isActive(n.to))
+  const needsOrg = isPlatform && current?.orgScoped && orgId == null
 
   const renderItem = (n: NavItem) => (
     <li key={n.to} className={`sidebar-item ${isActive(n.to) ? 'selected' : ''}`}>
@@ -84,7 +165,7 @@ export function AppShell() {
             </a>
             <div className="navbar-brand">
               <NavLink to="/">
-                <img src="/template/images/freepower.svg" alt="HRM Management" className="img-fluid" />
+                <img src="/template/images/freepower.svg" alt="mindHR" className="img-fluid" />
               </NavLink>
             </div>
             <a className="topbartoggler d-block d-lg-none waves-effect waves-light" onClick={() => setNavOpen((v) => !v)}>
@@ -93,6 +174,11 @@ export function AppShell() {
           </div>
           <div className={`navbar-collapse collapse ${navOpen ? 'show' : ''}`} id="navbarSupportedContent">
             <ul className="navbar-nav float-start me-auto ms-3 ps-1">
+              {isPlatform && (
+                <li className="nav-item d-flex align-items-center me-3">
+                  <OrgPicker />
+                </li>
+              )}
               <li className="nav-item d-none d-md-block">
                 <span className="nav-link text-muted">
                   {session?.userType.replace('_', ' ')} &middot; scope {session?.dataScope}
@@ -131,18 +217,24 @@ export function AppShell() {
           <nav className="sidebar-nav">
             <ul id="sidebarnav">
               {renderItem(NAV[0])}
-              {platformItems.length > 0 && section('Platform')}
-              {platformItems.map(renderItem)}
-              {moduleItems.length > 0 && section('Modules')}
-              {moduleItems.map(renderItem)}
+              {sections.map((s) => (
+                <Fragment key={s.key}>
+                  {section(SECTION_TITLES[s.key])}
+                  {s.items.map(renderItem)}
+                </Fragment>
+              ))}
             </ul>
           </nav>
         </div>
       </aside>
 
-      <div className="page-wrapper" key={location.pathname} onClick={() => userMenu && setUserMenu(false)}>
-        <Outlet />
-        <footer className="footer text-center text-muted">HRM Management &middot; built on FreeDash</footer>
+      <div
+        className="page-wrapper"
+        key={`${location.pathname}:${orgId ?? ''}`}
+        onClick={() => userMenu && setUserMenu(false)}
+      >
+        {needsOrg ? <OrgRequired /> : <Outlet />}
+        <footer className="footer text-center text-muted">mindHR &middot; built on FreeDash</footer>
       </div>
     </div>
   )

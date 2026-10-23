@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.hrm.mobile"
+    namespace = "com.mindhr.mobile"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.hrm.mobile"
+        applicationId = "com.mindhr.mobile"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
