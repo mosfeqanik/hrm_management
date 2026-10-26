@@ -80,10 +80,11 @@ export default function LoginPage() {
       <main className="login-card">
         <div className="login-content">
           <div className="login-brand">
-            <span className="login-brand-mark" aria-hidden="true">
-              m
-            </span>
-            mindHR
+            <img
+              src={theme === 'dark' ? '/brand/mindhr-lockup-dark.png' : '/brand/mindhr-lockup.png'}
+              alt="mindHR"
+              className="login-brand-logo"
+            />
           </div>
 
           <header className="login-header">

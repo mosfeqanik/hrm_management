@@ -4,8 +4,8 @@ import * as THREE from 'three'
 export type LoginTheme = 'light' | 'dark'
 
 const PALETTES = {
-  light: { p1: 0x6366f1, p2: 0x8b5cf6, p3: 0x06b6d4, line: 0x94a3b8, opacity1: 0.55, opacity2: 0.35, lineOpacity: 0.08 },
-  dark: { p1: 0x818cf8, p2: 0xa78bfa, p3: 0x22d3ee, line: 0xcbd5e1, opacity1: 0.75, opacity2: 0.5, lineOpacity: 0.12 },
+  light: { p1: 0x1bc48d, p2: 0x0685e6, p3: 0x009fa2, line: 0x94a3b8, opacity1: 0.55, opacity2: 0.35, lineOpacity: 0.08 },
+  dark: { p1: 0x34d399, p2: 0x38bdf8, p3: 0x2dd4bf, line: 0xcbd5e1, opacity1: 0.75, opacity2: 0.5, lineOpacity: 0.12 },
 }
 type Palette = (typeof PALETTES)[LoginTheme]
 

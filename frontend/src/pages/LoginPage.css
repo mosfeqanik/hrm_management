@@ -10,12 +10,13 @@
   --input-bg: rgba(255, 255, 255, 0.9);
   --input-border: #dbe2ea;
   --input-hover: #c7d2dd;
-  --ring: #6366f1;
-  --ring-soft: rgba(99, 102, 241, 0.18);
-  --btn-bg: #6366f1;
-  --btn-hover: #4f46e5;
+  --ring: #088566;
+  --ring-soft: rgba(8, 133, 102, 0.18);
+  --btn-bg: #088566;
+  --btn-hover: #066b52;
   --btn-text: #ffffff;
-  --btn-shadow: 0 10px 24px -8px rgba(99, 102, 241, 0.55);
+  --btn-shadow: 0 10px 24px -8px rgba(8, 133, 102, 0.55);
+  --glow: rgba(27, 196, 141, 0.16);
   --card-shadow: 0 24px 60px -20px rgba(15, 23, 42, 0.18), 0 8px 24px -12px rgba(15, 23, 42, 0.08);
   --toggle-bg: #eef2f7;
   --toggle-icon: #0f172a;
@@ -48,12 +49,13 @@
   --input-bg: rgba(15, 23, 42, 0.75);
   --input-border: #334155;
   --input-hover: #475569;
-  --ring: #818cf8;
-  --ring-soft: rgba(129, 140, 248, 0.22);
-  --btn-bg: #818cf8;
-  --btn-hover: #a5b4fc;
+  --ring: #25c28f;
+  --ring-soft: rgba(37, 194, 143, 0.22);
+  --btn-bg: #25c28f;
+  --btn-hover: #4fd6a9;
   --btn-text: #0b1120;
-  --btn-shadow: 0 10px 24px -8px rgba(129, 140, 248, 0.5);
+  --btn-shadow: 0 10px 24px -8px rgba(37, 194, 143, 0.5);
+  --glow: rgba(37, 194, 143, 0.14);
   --card-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65), 0 12px 28px -12px rgba(0, 0, 0, 0.45);
   --toggle-bg: #334155;
   --toggle-icon: #f1f5f9;
@@ -112,7 +114,7 @@
   inset: -40% auto auto -20%;
   width: 70%;
   height: 70%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -125,25 +127,13 @@
 .login-brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
   margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--text-primary);
 }
 
-.login-brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 0.7rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6 55%, #06b6d4);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.95rem;
+.login-brand-logo {
+  height: 40px;
+  width: auto;
+  display: block;
 }
 
 .login-header {

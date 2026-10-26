@@ -165,7 +165,7 @@ export function AppShell() {
             </a>
             <div className="navbar-brand">
               <NavLink to="/">
-                <img src="/template/images/freepower.svg" alt="mindHR" className="img-fluid" />
+                <img src="/brand/mindhr-lockup.png" alt="mindHR" className="mh-brand-logo" />
               </NavLink>
             </div>
             <a className="topbartoggler d-block d-lg-none waves-effect waves-light" onClick={() => setNavOpen((v) => !v)}>

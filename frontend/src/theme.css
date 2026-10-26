@@ -1,0 +1,149 @@
+/*
+ * mindHR brand theme. Loaded after the FreeDash template CSS (index.html) and overrides its purple primary
+ * (#5f76e8) with the green from the logo. Logo files live in public/brand.
+ */
+:root {
+  /* Logo colors */
+  --mh-navy: #1a2f4e; /* "mind" wordmark */
+  --mh-blue-deep: #0152d7; /* head, left end of the gradient */
+  --mh-blue: #0685e6;
+  --mh-teal: #009fa2; /* "h" */
+  --mh-green: #1bc48d; /* leaf, right end of the gradient */
+  --mh-green-light: #25c28f;
+  --mh-gradient: linear-gradient(135deg, var(--mh-blue-deep), var(--mh-teal) 55%, var(--mh-green));
+
+  /* UI green: deeper than the logo green so white text on it stays readable (4.6:1) */
+  --mh-primary: #088566;
+  --mh-primary-hover: #066b52;
+  --mh-primary-active: #055a45;
+  --mh-primary-subtle: #e6f7f1;
+
+  --bs-primary: #088566;
+  --bs-primary-rgb: 8, 133, 102;
+  --bs-primary-text-emphasis: #055a45;
+  --bs-primary-bg-subtle: #e6f7f1;
+  --bs-primary-border-subtle: #9fdcc8;
+  --bs-info: #0685e6;
+  --bs-info-rgb: 6, 133, 230;
+  --bs-blue: #0685e6;
+  --bs-cyan: #009fa2;
+  --bs-purple: #088566;
+  --bs-link-color: #088566;
+  --bs-link-color-rgb: 8, 133, 102;
+  --bs-link-hover-color: #066b52;
+  --bs-link-hover-color-rgb: 6, 107, 82;
+  --bs-focus-ring-color: rgba(8, 133, 102, 0.25);
+}
+
+.btn-primary,
+.btn-purple {
+  --bs-btn-bg: var(--mh-primary);
+  --bs-btn-border-color: var(--mh-primary);
+  --bs-btn-hover-bg: var(--mh-primary-hover);
+  --bs-btn-hover-border-color: var(--mh-primary-hover);
+  --bs-btn-active-bg: var(--mh-primary-active);
+  --bs-btn-active-border-color: var(--mh-primary-active);
+  --bs-btn-disabled-bg: var(--mh-primary);
+  --bs-btn-disabled-border-color: var(--mh-primary);
+  --bs-btn-focus-shadow-rgb: 8, 133, 102;
+}
+
+.btn-info {
+  --bs-btn-bg: var(--mh-blue);
+  --bs-btn-border-color: var(--mh-blue);
+  --bs-btn-hover-bg: #0570c2;
+  --bs-btn-hover-border-color: #0570c2;
+  --bs-btn-active-bg: #0466b0;
+  --bs-btn-active-border-color: #0466b0;
+  --bs-btn-focus-shadow-rgb: 6, 133, 230;
+}
+
+.btn-outline-primary,
+.btn-outline-purple {
+  --bs-btn-color: var(--mh-primary);
+  --bs-btn-border-color: var(--mh-primary);
+  --bs-btn-hover-bg: var(--mh-primary);
+  --bs-btn-hover-border-color: var(--mh-primary);
+  --bs-btn-active-bg: var(--mh-primary-hover);
+  --bs-btn-active-border-color: var(--mh-primary-hover);
+  --bs-btn-focus-shadow-rgb: 8, 133, 102;
+}
+
+.btn-outline-info {
+  --bs-btn-color: var(--mh-blue);
+  --bs-btn-border-color: var(--mh-blue);
+  --bs-btn-hover-bg: var(--mh-blue);
+  --bs-btn-hover-border-color: var(--mh-blue);
+  --bs-btn-active-bg: var(--mh-blue);
+  --bs-btn-active-border-color: var(--mh-blue);
+}
+
+.text-bg-primary,
+.text-bg-purple {
+  background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity, 1)) !important;
+}
+.text-bg-info {
+  background-color: rgba(var(--bs-info-rgb), var(--bs-bg-opacity, 1)) !important;
+}
+.link-primary,
+.link-purple {
+  color: var(--mh-primary) !important;
+}
+.link-info {
+  color: var(--mh-blue) !important;
+}
+
+a:hover,
+a.link:focus,
+a.link:hover,
+ul.list-style-none li a:hover {
+  color: var(--mh-primary-hover);
+}
+
+.form-check-input:checked,
+.form-check-input[type='checkbox']:indeterminate {
+  background-color: var(--mh-primary);
+  border-color: var(--mh-primary);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--mh-primary);
+  box-shadow: 0 0 0 0.2rem rgba(8, 133, 102, 0.15);
+}
+.form-range::-webkit-slider-thumb {
+  background-color: var(--mh-primary);
+}
+.form-range::-moz-range-thumb {
+  background-color: var(--mh-primary);
+}
+
+.nav-pills {
+  --bs-nav-pills-link-active-bg: var(--mh-primary);
+}
+.nav-tabs .nav-link.active {
+  color: var(--mh-primary);
+}
+.nav-tabs.nav-bordered li a.active {
+  border-bottom-color: var(--mh-primary);
+}
+.pagination {
+  --bs-pagination-active-bg: var(--mh-primary);
+  --bs-pagination-active-border-color: var(--mh-primary);
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(8, 133, 102, 0.25);
+}
+.progress,
+.progress-stacked {
+  --bs-progress-bar-bg: var(--mh-primary);
+}
+
+/* Sidebar: the selected item uses the logo gradient instead of the template's purple one. */
+.sidebar-nav #sidebarnav .sidebar-item.selected > .sidebar-link {
+  background: linear-gradient(to right, var(--mh-blue), var(--mh-teal) 55%, var(--mh-green));
+  box-shadow: 0 7px 12px 0 rgba(0, 159, 162, 0.22);
+}
+
+/* Top-bar logo */
+.navbar-brand .mh-brand-logo {
+  height: 34px;
+  width: auto;
+}
