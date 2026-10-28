@@ -6,9 +6,10 @@ import { errorMessage } from '../../api/client'
 import { systemSettingsApi } from '../../api/platform'
 import type { SystemSetting } from '../../api/types'
 import { useResource } from '../../api/useResource'
-import { Button, DataTable, ErrorBox, Field, Input, Modal, ModalFooter, PageHeader, type Column } from '../../components/ui'
+import { Edit2, Trash2 } from 'react-feather'
+import { DataTable, ErrorBox, Field, IconButton, Input, Modal, ModalFooter, PageHeader, type Column } from '../../components/ui'
 import { orNull } from '../../lib/format'
-import { Card } from './shared'
+import { AddButton, Card } from './shared'
 
 const schema = z.object({
   key: z.string().min(1, 'Key is required').max(100),
@@ -66,7 +67,7 @@ export default function SystemSettingsPage() {
   const [editing, setEditing] = useState<SystemSetting | 'new' | null>(null)
 
   const columns: Column<SystemSetting>[] = [
-    { header: 'Key', cell: (s) => <code>{s.key}</code> },
+    { header: 'Key', cell: (s) => <code>{s.key}</code>, value: (s) => s.key },
     { header: 'Value', cell: (s) => s.value ?? '-' },
     { header: 'Description', cell: (s) => s.description ?? '-' },
     {
@@ -74,17 +75,14 @@ export default function SystemSettingsPage() {
       className: 'text-end text-nowrap',
       cell: (s) => (
         <>
-          <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(s)}>
-            Edit
-          </Button>
-          <Button
+          <IconButton icon={<Edit2 size={15} />} label="Edit" className="me-1" onClick={() => setEditing(s)} />
+          <IconButton
+            icon={<Trash2 size={15} />}
+            label="Delete"
             variant="danger"
-            size="sm"
             disabled={remove.isPending}
             onClick={() => confirm(`Delete setting ${s.key}?`) && remove.mutate(s.id)}
-          >
-            Delete
-          </Button>
+          />
         </>
       ),
     },
@@ -92,15 +90,11 @@ export default function SystemSettingsPage() {
 
   return (
     <>
-      <PageHeader
-        title="System Settings"
-        trail={['Platform']}
-        actions={<Button onClick={() => setEditing('new')}>Add setting</Button>}
-      />
-      <Card title="Settings">
+      <PageHeader title="System Settings" trail={['Platform']} />
+      <Card title="Settings" actions={<AddButton onClick={() => setEditing('new')}>Add setting</AddButton>}>
         {error && <ErrorBox message={errorMessage(error)} />}
         {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
-        <DataTable columns={columns} rows={rows} loading={isLoading} empty="No settings yet." />
+        <DataTable datatable columns={columns} rows={rows} loading={isLoading} empty="No settings yet." />
       </Card>
       {editing && (
         <SettingForm

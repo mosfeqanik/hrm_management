@@ -3,11 +3,24 @@ import * as THREE from 'three'
 
 export type LoginTheme = 'light' | 'dark'
 
-const PALETTES = {
-  light: { p1: 0x1bc48d, p2: 0x0685e6, p3: 0x009fa2, line: 0x94a3b8, opacity1: 0.55, opacity2: 0.35, lineOpacity: 0.08 },
-  dark: { p1: 0x34d399, p2: 0x38bdf8, p3: 0x2dd4bf, line: 0xcbd5e1, opacity1: 0.75, opacity2: 0.5, lineOpacity: 0.12 },
+/** Reads a color token from styles/colors.css, so the particles follow the same palette as the CSS. */
+function token(name: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 }
-type Palette = (typeof PALETTES)[LoginTheme]
+
+function palette(t: LoginTheme) {
+  const d = t === 'dark' ? '-dark' : ''
+  return {
+    p1: token(`--mh-particle${d}-1`),
+    p2: token(`--mh-particle${d}-2`),
+    p3: token(`--mh-particle${d}-3`),
+    line: token(`--mh-particle${d}-line`),
+    ...(t === 'dark'
+      ? { opacity1: 0.75, opacity2: 0.5, lineOpacity: 0.12 }
+      : { opacity1: 0.55, opacity2: 0.35, lineOpacity: 0.08 }),
+  }
+}
+type Palette = ReturnType<typeof palette>
 
 /** Random point on a sphere shell between rMin and rMin + rSpread. */
 function spherePoint(rMin: number, rSpread: number): [number, number, number] {
@@ -116,7 +129,7 @@ export function ParticleBackground({ theme }: { theme: LoginTheme }) {
     scene.add(near, far, lines)
 
     applyThemeRef.current = (t) => {
-      const p = PALETTES[t]
+      const p = palette(t)
       paintColors(near.geometry.getAttribute('color') as THREE.BufferAttribute, p, true)
       paintColors(far.geometry.getAttribute('color') as THREE.BufferAttribute, p, false)
       near.material.opacity = p.opacity1

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Edit2, Trash2 } from 'react-feather'
 import { z } from 'zod'
 import { errorMessage } from '../../api/client'
 import { subscriptionPlansApi } from '../../api/platform'
@@ -9,8 +10,8 @@ import { useResource } from '../../api/useResource'
 import { useAuth } from '../../auth/AuthContext'
 import {
   ActiveBadge,
-  Button,
   DataTable,
+  IconButton,
   ErrorBox,
   Field,
   Input,
@@ -21,7 +22,7 @@ import {
   type Column,
 } from '../../components/ui'
 import { formatMoney, label, numOrNull, orNull } from '../../lib/format'
-import { Card } from './shared'
+import { AddButton, Card } from './shared'
 
 const count = z.string().regex(/^\d*$/, 'Whole number')
 
@@ -165,33 +166,35 @@ export default function SubscriptionPlansPage() {
   const [editing, setEditing] = useState<SubscriptionPlan | 'new' | null>(null)
 
   const columns: Column<SubscriptionPlan>[] = [
-    { header: 'Name', cell: (p) => <span className="text-dark font-weight-medium">{p.name}</span> },
+    { header: 'Name', cell: (p) => <span className="text-dark font-weight-medium">{p.name}</span>, value: (p) => p.name },
     {
       header: 'Price',
       cell: (p) => `${formatMoney(p.price)} ${p.currency ?? ''} / ${p.billingCycle === 'MONTHLY' ? 'month' : 'year'}`,
+      value: (p) => p.price,
     },
-    { header: 'Employees', cell: (p) => p.maxEmployees ?? 'No limit' },
-    { header: 'Branches', cell: (p) => p.maxBranches ?? 'No limit' },
-    { header: 'Trial', cell: (p) => `${p.trialDays} days` },
-    { header: 'Features', cell: (p) => <small>{p.features.map(label).join(', ') || '-'}</small> },
-    { header: 'Status', cell: (p) => <ActiveBadge active={p.active} /> },
+    { header: 'Employees', cell: (p) => p.maxEmployees ?? 'No limit', value: (p) => p.maxEmployees ?? Infinity },
+    { header: 'Branches', cell: (p) => p.maxBranches ?? 'No limit', value: (p) => p.maxBranches ?? Infinity },
+    { header: 'Trial', cell: (p) => `${p.trialDays} days`, value: (p) => p.trialDays },
+    {
+      header: 'Features',
+      cell: (p) => <small>{p.features.map(label).join(', ') || '-'}</small>,
+      value: (p) => p.features.map(label).join(', '),
+    },
+    { header: 'Status', cell: (p) => <ActiveBadge active={p.active} />, value: (p) => (p.active ? 'Active' : 'Inactive') },
     {
       header: '',
       className: 'text-end text-nowrap',
       cell: (p) =>
         canEdit && (
           <>
-            <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(p)}>
-              Edit
-            </Button>
-            <Button
+            <IconButton icon={<Edit2 size={15} />} label="Edit" className="me-1" onClick={() => setEditing(p)} />
+            <IconButton
+              icon={<Trash2 size={15} />}
+              label="Delete"
               variant="danger"
-              size="sm"
               disabled={remove.isPending}
               onClick={() => confirm(`Delete plan ${p.name}?`) && remove.mutate(p.id)}
-            >
-              Delete
-            </Button>
+            />
           </>
         ),
     },
@@ -199,15 +202,11 @@ export default function SubscriptionPlansPage() {
 
   return (
     <>
-      <PageHeader
-        title="Subscription Plans"
-        trail={['Platform']}
-        actions={canEdit && <Button onClick={() => setEditing('new')}>Add plan</Button>}
-      />
-      <Card title="Plans">
+      <PageHeader title="Subscription Plans" trail={['Platform']} />
+      <Card title="Plans" actions={canEdit && <AddButton onClick={() => setEditing('new')}>Add plan</AddButton>}>
         {error && <ErrorBox message={errorMessage(error)} />}
         {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
-        <DataTable columns={columns} rows={rows} loading={isLoading} empty="No plans yet." />
+        <DataTable datatable columns={columns} rows={rows} loading={isLoading} empty="No plans yet." />
       </Card>
       {editing && (
         <PlanForm

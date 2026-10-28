@@ -14,10 +14,6 @@ public record OrganizationRequest(
         @Size(max = 150, message = "Name must be at most 150 characters")
         String name,
 
-        @NotBlank(message = "Slug is required")
-        @Size(max = 100, message = "Slug must be at most 100 characters")
-        String slug,
-
         @NotNull(message = "Status is required")
         OrganizationStatus status,
 

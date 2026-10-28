@@ -1,105 +1,136 @@
 /*
- * mindHR brand theme. Loaded after the FreeDash template CSS (index.html) and overrides its purple primary
- * (#5f76e8) with the green from the logo. Logo files live in public/brand.
+ * mindHR theme on top of the FreeDash template CSS (index.html). Colors come only from
+ * styles/colors.css; do not add hex or rgb values here. Logo files live in public/brand.
  */
-:root {
-  /* Logo colors */
-  --mh-navy: #1a2f4e; /* "mind" wordmark */
-  --mh-blue-deep: #0152d7; /* head, left end of the gradient */
-  --mh-blue: #0685e6;
-  --mh-teal: #009fa2; /* "h" */
-  --mh-green: #1bc48d; /* leaf, right end of the gradient */
-  --mh-green-light: #25c28f;
-  --mh-gradient: linear-gradient(135deg, var(--mh-blue-deep), var(--mh-teal) 55%, var(--mh-green));
 
-  /* UI green: deeper than the logo green so white text on it stays readable (4.6:1) */
-  --mh-primary: #088566;
-  --mh-primary-hover: #066b52;
-  --mh-primary-active: #055a45;
-  --mh-primary-subtle: #e6f7f1;
-
-  --bs-primary: #088566;
-  --bs-primary-rgb: 8, 133, 102;
-  --bs-primary-text-emphasis: #055a45;
-  --bs-primary-bg-subtle: #e6f7f1;
-  --bs-primary-border-subtle: #9fdcc8;
-  --bs-info: #0685e6;
-  --bs-info-rgb: 6, 133, 230;
-  --bs-blue: #0685e6;
-  --bs-cyan: #009fa2;
-  --bs-purple: #088566;
-  --bs-link-color: #088566;
-  --bs-link-color-rgb: 8, 133, 102;
-  --bs-link-hover-color: #066b52;
-  --bs-link-hover-color-rgb: 6, 107, 82;
-  --bs-focus-ring-color: rgba(8, 133, 102, 0.25);
+/* The template hides .page-wrapper until its jQuery init script shows it; that script is not used here. */
+.page-wrapper {
+  display: block;
 }
 
-.btn-primary,
-.btn-purple {
-  --bs-btn-bg: var(--mh-primary);
-  --bs-btn-border-color: var(--mh-primary);
-  --bs-btn-hover-bg: var(--mh-primary-hover);
-  --bs-btn-hover-border-color: var(--mh-primary-hover);
-  --bs-btn-active-bg: var(--mh-primary-active);
-  --bs-btn-active-border-color: var(--mh-primary-active);
-  --bs-btn-disabled-bg: var(--mh-primary);
-  --bs-btn-disabled-border-color: var(--mh-primary);
-  --bs-btn-focus-shadow-rgb: 8, 133, 102;
+/* ---------- Text: black, hover black ---------- */
+body {
+  color: var(--mh-text);
+  background: var(--mh-surface-alt);
 }
-
-.btn-info {
-  --bs-btn-bg: var(--mh-blue);
-  --bs-btn-border-color: var(--mh-blue);
-  --bs-btn-hover-bg: #0570c2;
-  --bs-btn-hover-border-color: #0570c2;
-  --bs-btn-active-bg: #0466b0;
-  --bs-btn-active-border-color: #0466b0;
-  --bs-btn-focus-shadow-rgb: 6, 133, 230;
+.form-check-label,
+a.link,
+ul.list-style-none li a {
+  color: var(--mh-text);
 }
-
-.btn-outline-primary,
-.btn-outline-purple {
-  --bs-btn-color: var(--mh-primary);
-  --bs-btn-border-color: var(--mh-primary);
-  --bs-btn-hover-bg: var(--mh-primary);
-  --bs-btn-hover-border-color: var(--mh-primary);
-  --bs-btn-active-bg: var(--mh-primary-hover);
-  --bs-btn-active-border-color: var(--mh-primary-hover);
-  --bs-btn-focus-shadow-rgb: 8, 133, 102;
+.btn {
+  --bs-btn-color: var(--mh-text);
 }
-
-.btn-outline-info {
-  --bs-btn-color: var(--mh-blue);
-  --bs-btn-border-color: var(--mh-blue);
-  --bs-btn-hover-bg: var(--mh-blue);
-  --bs-btn-hover-border-color: var(--mh-blue);
-  --bs-btn-active-bg: var(--mh-blue);
-  --bs-btn-active-border-color: var(--mh-blue);
+.card .card-title,
+.page-breadcrumb .page-title,
+.text-dark {
+  color: var(--mh-text) !important;
 }
-
-.text-bg-primary,
-.text-bg-purple {
-  background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity, 1)) !important;
-}
-.text-bg-info {
-  background-color: rgba(var(--bs-info-rgb), var(--bs-bg-opacity, 1)) !important;
-}
-.link-primary,
-.link-purple {
-  color: var(--mh-primary) !important;
-}
-.link-info {
-  color: var(--mh-blue) !important;
-}
-
 a:hover,
 a.link:focus,
 a.link:hover,
 ul.list-style-none li a:hover {
-  color: var(--mh-primary-hover);
+  color: var(--mh-text-hover);
+}
+#main-wrapper[data-layout='vertical'] .left-sidebar[data-sidebarbg='skin6'] .sidebar-nav ul .sidebar-item .sidebar-link,
+#main-wrapper[data-layout='vertical'] .left-sidebar[data-sidebarbg='skin6'] .sidebar-nav ul .sidebar-item .sidebar-link .feather-icon {
+  color: var(--mh-text);
+}
+#main-wrapper[data-layout='vertical'] .left-sidebar[data-sidebarbg='skin6'] .sidebar-nav ul .sidebar-item .sidebar-link:hover,
+#main-wrapper[data-layout='vertical'] .left-sidebar[data-sidebarbg='skin6'] .sidebar-nav ul .sidebar-item .sidebar-link:hover .feather-icon {
+  color: var(--mh-text-hover);
 }
 
+/* ---------- Buttons ---------- */
+.btn-primary,
+.btn-purple,
+.btn-cyan {
+  --bs-btn-color: var(--mh-white);
+  --bs-btn-bg: var(--mh-primary);
+  --bs-btn-border-color: var(--mh-primary);
+  --bs-btn-hover-color: var(--mh-white);
+  --bs-btn-hover-bg: var(--mh-primary-hover);
+  --bs-btn-hover-border-color: var(--mh-primary-hover);
+  --bs-btn-active-color: var(--mh-white);
+  --bs-btn-active-bg: var(--mh-primary-active);
+  --bs-btn-active-border-color: var(--mh-primary-active);
+  --bs-btn-disabled-bg: var(--mh-primary);
+  --bs-btn-disabled-border-color: var(--mh-primary);
+  --bs-btn-focus-shadow-rgb: var(--mh-primary-rgb);
+}
+.btn-info {
+  --bs-btn-bg: var(--mh-info);
+  --bs-btn-border-color: var(--mh-info);
+  --bs-btn-hover-bg: var(--mh-info-hover);
+  --bs-btn-hover-border-color: var(--mh-info-hover);
+  --bs-btn-active-bg: var(--mh-info-hover);
+  --bs-btn-active-border-color: var(--mh-info-hover);
+  --bs-btn-focus-shadow-rgb: var(--mh-info-rgb);
+}
+.btn-outline-primary,
+.btn-outline-purple,
+.btn-outline-cyan {
+  --bs-btn-color: var(--mh-primary);
+  --bs-btn-border-color: var(--mh-primary);
+  --bs-btn-hover-color: var(--mh-white);
+  --bs-btn-hover-bg: var(--mh-primary);
+  --bs-btn-hover-border-color: var(--mh-primary);
+  --bs-btn-active-bg: var(--mh-primary-hover);
+  --bs-btn-active-border-color: var(--mh-primary-hover);
+  --bs-btn-focus-shadow-rgb: var(--mh-primary-rgb);
+}
+.btn-outline-info {
+  --bs-btn-color: var(--mh-info);
+  --bs-btn-border-color: var(--mh-info);
+  --bs-btn-hover-bg: var(--mh-info);
+  --bs-btn-hover-border-color: var(--mh-info);
+  --bs-btn-active-bg: var(--mh-info);
+  --bs-btn-active-border-color: var(--mh-info);
+}
+.btn-outline-secondary {
+  --bs-btn-color: var(--mh-text);
+  --bs-btn-border-color: var(--mh-border-strong);
+  --bs-btn-hover-color: var(--mh-text-hover);
+  --bs-btn-hover-bg: var(--mh-primary-subtle);
+  --bs-btn-hover-border-color: var(--mh-primary);
+  --bs-btn-active-color: var(--mh-text-hover);
+  --bs-btn-active-bg: var(--mh-primary-subtle);
+  --bs-btn-active-border-color: var(--mh-primary);
+}
+.btn-success {
+  --bs-btn-bg: var(--mh-success);
+  --bs-btn-border-color: var(--mh-success);
+}
+.btn-danger {
+  --bs-btn-bg: var(--mh-danger);
+  --bs-btn-border-color: var(--mh-danger);
+}
+.btn-outline-danger {
+  --bs-btn-color: var(--mh-danger);
+  --bs-btn-border-color: var(--mh-danger);
+  --bs-btn-hover-bg: var(--mh-danger);
+  --bs-btn-hover-border-color: var(--mh-danger);
+  --bs-btn-active-bg: var(--mh-danger);
+  --bs-btn-active-border-color: var(--mh-danger);
+}
+
+/* ---------- Badges, links, forms ---------- */
+.text-bg-primary,
+.text-bg-purple,
+.text-bg-cyan {
+  background-color: rgba(var(--mh-primary-rgb), var(--bs-bg-opacity, 1)) !important;
+}
+.text-bg-info {
+  background-color: rgba(var(--mh-info-rgb), var(--bs-bg-opacity, 1)) !important;
+}
+.link-primary,
+.link-purple,
+.link-cyan {
+  color: var(--mh-primary) !important;
+}
+.link-info {
+  color: var(--mh-info) !important;
+}
 .form-check-input:checked,
 .form-check-input[type='checkbox']:indeterminate {
   background-color: var(--mh-primary);
@@ -108,7 +139,7 @@ ul.list-style-none li a:hover {
 .form-control:focus,
 .form-select:focus {
   border-color: var(--mh-primary);
-  box-shadow: 0 0 0 0.2rem rgba(8, 133, 102, 0.15);
+  box-shadow: 0 0 0 0.2rem var(--mh-focus-ring);
 }
 .form-range::-webkit-slider-thumb {
   background-color: var(--mh-primary);
@@ -117,8 +148,12 @@ ul.list-style-none li a:hover {
   background-color: var(--mh-primary);
 }
 
+/* ---------- Navigation ---------- */
 .nav-pills {
   --bs-nav-pills-link-active-bg: var(--mh-primary);
+}
+.nav-tabs .nav-link {
+  color: var(--mh-text);
 }
 .nav-tabs .nav-link.active {
   color: var(--mh-primary);
@@ -127,9 +162,15 @@ ul.list-style-none li a:hover {
   border-bottom-color: var(--mh-primary);
 }
 .pagination {
+  --bs-pagination-color: var(--mh-text);
+  --bs-pagination-hover-color: var(--mh-text-hover);
+  --bs-pagination-hover-bg: var(--mh-primary-subtle);
+  --bs-pagination-active-color: var(--mh-white);
   --bs-pagination-active-bg: var(--mh-primary);
   --bs-pagination-active-border-color: var(--mh-primary);
-  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(8, 133, 102, 0.25);
+  --bs-pagination-disabled-color: var(--mh-text-muted);
+  --bs-pagination-disabled-bg: var(--mh-white);
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem var(--mh-focus-ring);
 }
 .progress,
 .progress-stacked {
@@ -138,8 +179,79 @@ ul.list-style-none li a:hover {
 
 /* Sidebar: the selected item uses the logo gradient instead of the template's purple one. */
 .sidebar-nav #sidebarnav .sidebar-item.selected > .sidebar-link {
-  background: linear-gradient(to right, var(--mh-blue), var(--mh-teal) 55%, var(--mh-green));
-  box-shadow: 0 7px 12px 0 rgba(0, 159, 162, 0.22);
+  background: var(--mh-gradient);
+  box-shadow: 0 7px 12px 0 var(--mh-focus-ring);
+}
+
+/* ---------- DataTable (`datatable` mode): tinted header, sort arrows like the DataTables Bootstrap skin ---------- */
+.mh-datatable {
+  --bs-table-color: var(--mh-text);
+  --bs-table-striped-color: var(--mh-text);
+  --bs-table-hover-color: var(--mh-text-hover);
+  --bs-table-border-color: var(--mh-border);
+  --bs-table-striped-bg: var(--mh-surface-alt);
+  --bs-table-accent-bg: transparent;
+  --bs-table-hover-bg: var(--mh-row-hover);
+}
+.mh-datatable > thead th {
+  background: var(--mh-primary-subtle);
+  color: var(--mh-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.mh-datatable > tbody td {
+  vertical-align: middle;
+}
+.mh-datatable > tbody > tr:only-child > td[colspan] {
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--mh-text-muted);
+  padding: 2rem 1rem;
+}
+.mh-datatable th.sorting {
+  position: relative;
+  padding-right: 1.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+.mh-datatable th.sorting::before,
+.mh-datatable th.sorting::after {
+  position: absolute;
+  right: 0.55rem;
+  font-size: 0.7rem;
+  line-height: 1;
+  opacity: 0.25;
+}
+.mh-datatable th.sorting::before {
+  content: '▲';
+  bottom: 52%;
+}
+.mh-datatable th.sorting::after {
+  content: '▼';
+  top: 52%;
+}
+.mh-datatable th.sorting-asc::before,
+.mh-datatable th.sorting-desc::after {
+  opacity: 1;
+  color: var(--mh-primary);
+}
+.mh-datatable-wrapper .pagination .page-link {
+  cursor: pointer;
+}
+.mh-datatable-wrapper label {
+  color: var(--mh-text);
+}
+.mh-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
 }
 
 /* Top-bar logo */

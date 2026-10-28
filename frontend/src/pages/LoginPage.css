@@ -1,28 +1,31 @@
-/* Login screen only; everything is scoped under .login-page so the FreeDash styles elsewhere are untouched. */
+/*
+ * Login screen only; everything is scoped under .login-page so the FreeDash styles elsewhere are untouched.
+ * Colors come from styles/colors.css.
+ */
 .login-page {
-  --bg-start: #f4f6fb;
-  --bg-end: #e6ebf5;
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --card-border: rgba(15, 23, 42, 0.06);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --input-bg: rgba(255, 255, 255, 0.9);
-  --input-border: #dbe2ea;
-  --input-hover: #c7d2dd;
-  --ring: #088566;
-  --ring-soft: rgba(8, 133, 102, 0.18);
-  --btn-bg: #088566;
-  --btn-hover: #066b52;
-  --btn-text: #ffffff;
-  --btn-shadow: 0 10px 24px -8px rgba(8, 133, 102, 0.55);
-  --glow: rgba(27, 196, 141, 0.16);
-  --card-shadow: 0 24px 60px -20px rgba(15, 23, 42, 0.18), 0 8px 24px -12px rgba(15, 23, 42, 0.08);
-  --toggle-bg: #eef2f7;
-  --toggle-icon: #0f172a;
-  --error: #dc2626;
-  --error-bg: rgba(220, 38, 38, 0.08);
-  --vignette: rgba(0, 0, 0, 0.04);
+  --bg-start: var(--mh-login-bg-start);
+  --bg-end: var(--mh-login-bg-end);
+  --card-bg: var(--mh-glass);
+  --card-border: var(--mh-glass-border);
+  --text-primary: var(--mh-text);
+  --text-secondary: var(--mh-text);
+  --text-muted: var(--mh-text-muted);
+  --input-bg: var(--mh-glass-input);
+  --input-border: var(--mh-border-strong);
+  --input-hover: var(--mh-primary-border);
+  --ring: var(--mh-primary);
+  --ring-soft: var(--mh-focus-ring);
+  --btn-bg: var(--mh-primary);
+  --btn-hover: var(--mh-primary-hover);
+  --btn-text: var(--mh-white);
+  --btn-shadow: var(--mh-shadow-primary);
+  --glow: var(--mh-focus-ring);
+  --card-shadow: var(--mh-shadow-card);
+  --toggle-bg: var(--mh-toggle-bg);
+  --toggle-icon: var(--mh-text);
+  --error: var(--mh-danger);
+  --error-bg: var(--mh-danger-subtle);
+  --vignette: var(--mh-vignette);
 
   position: fixed;
   inset: 0;
@@ -39,29 +42,29 @@
 }
 
 .login-page[data-theme='dark'] {
-  --bg-start: #0b1120;
-  --bg-end: #1e293b;
-  --card-bg: rgba(20, 28, 46, 0.78);
-  --card-border: rgba(148, 163, 184, 0.12);
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --input-bg: rgba(15, 23, 42, 0.75);
-  --input-border: #334155;
-  --input-hover: #475569;
-  --ring: #25c28f;
-  --ring-soft: rgba(37, 194, 143, 0.22);
-  --btn-bg: #25c28f;
-  --btn-hover: #4fd6a9;
-  --btn-text: #0b1120;
-  --btn-shadow: 0 10px 24px -8px rgba(37, 194, 143, 0.5);
-  --glow: rgba(37, 194, 143, 0.14);
-  --card-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65), 0 12px 28px -12px rgba(0, 0, 0, 0.45);
-  --toggle-bg: #334155;
-  --toggle-icon: #f1f5f9;
-  --error: #f87171;
-  --error-bg: rgba(248, 113, 113, 0.12);
-  --vignette: rgba(0, 0, 0, 0.35);
+  --bg-start: var(--mh-dark-bg);
+  --bg-end: var(--mh-dark-bg-alt);
+  --card-bg: var(--mh-dark-surface);
+  --card-border: var(--mh-dark-glass-border);
+  --text-primary: var(--mh-dark-text);
+  --text-secondary: var(--mh-dark-text-secondary);
+  --text-muted: var(--mh-dark-text-muted);
+  --input-bg: var(--mh-dark-input);
+  --input-border: var(--mh-dark-border);
+  --input-hover: var(--mh-dark-border-strong);
+  --ring: var(--mh-primary-light);
+  --ring-soft: var(--mh-focus-ring);
+  --btn-bg: var(--mh-primary-light);
+  --btn-hover: var(--mh-primary-light-hover);
+  --btn-text: var(--mh-dark-bg);
+  --btn-shadow: var(--mh-shadow-primary);
+  --glow: var(--mh-focus-ring);
+  --card-shadow: var(--mh-shadow-card-dark);
+  --toggle-bg: var(--mh-dark-border);
+  --toggle-icon: var(--mh-dark-text);
+  --error: var(--mh-dark-danger);
+  --error-bg: var(--mh-dark-danger-subtle);
+  --vignette: var(--mh-vignette-dark);
 }
 
 .login-page *,
@@ -274,7 +277,7 @@
 
 .login-toggle-password:hover {
   color: var(--text-primary);
-  background: rgba(100, 116, 139, 0.12);
+  background: var(--mh-hover-overlay);
 }
 
 /* ---------- Error and button ---------- */

@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { Plus } from 'react-feather'
 import { errorMessage } from '../../api/client'
 import { Button, ErrorBox, Field, Input, Modal, Select } from '../../components/ui'
 import { label, orNull } from '../../lib/format'
@@ -135,12 +136,26 @@ export function HistoryModal({
 }
 
 /** Card wrapper used by every platform page. */
-export function Card({ title, children }: { title: string; children: ReactNode }) {
+/** Primary "Add ..." button with a plus icon, for a Card's actions. */
+export function AddButton({ onClick, children }: { onClick: () => void; children: ReactNode }) {
+  return (
+    <Button onClick={onClick} className="d-inline-flex align-items-center gap-1">
+      <Plus size={16} aria-hidden="true" />
+      {children}
+    </Button>
+  )
+}
+
+/** Page card; `actions` (filters, the Add button) sit on the title row, right above the table. */
+export function Card({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
   return (
     <div className="container-fluid">
       <div className="card">
         <div className="card-body">
-          <h4 className="card-title">{title}</h4>
+          <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h4 className="card-title mb-0">{title}</h4>
+            {actions && <div className="d-flex flex-wrap align-items-center gap-2">{actions}</div>}
+          </div>
           {children}
         </div>
       </div>

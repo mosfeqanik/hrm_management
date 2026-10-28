@@ -3433,7 +3433,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"string\",\n  \"slug\": \"string\",\n  \"status\": \"TRIAL\",\n  \"email\": \"user@example.com\",\n  \"phone\": \"+8801700000000\",\n  \"address\": \"string\",\n  \"trialEndsAt\": \"2026-01-01T09:00:00\"\n}",
+              "raw": "{\n  \"name\": \"string\",\n  \"status\": \"TRIAL\",\n  \"email\": \"user@example.com\",\n  \"phone\": \"+8801700000000\",\n  \"address\": \"string\",\n  \"trialEndsAt\": \"2026-01-01T09:00:00\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -3471,7 +3471,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"string\",\n  \"slug\": \"string\",\n  \"status\": \"TRIAL\",\n  \"email\": \"user@example.com\",\n  \"phone\": \"+8801700000000\",\n  \"address\": \"string\",\n  \"trialEndsAt\": \"2026-01-01T09:00:00\"\n}",
+              "raw": "{\n  \"name\": \"string\",\n  \"status\": \"TRIAL\",\n  \"email\": \"user@example.com\",\n  \"phone\": \"+8801700000000\",\n  \"address\": \"string\",\n  \"trialEndsAt\": \"2026-01-01T09:00:00\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

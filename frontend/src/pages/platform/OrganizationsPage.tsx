@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Edit2, Trash2, UserCheck } from 'react-feather'
 import { z } from 'zod'
 import { errorMessage } from '../../api/client'
 import { organizationsApi, usersApi } from '../../api/platform'
@@ -10,6 +11,8 @@ import { useResource } from '../../api/useResource'
 import {
   Button,
   DataTable,
+  IconButton,
+  Textarea,
   ErrorBox,
   Field,
   Input,
@@ -20,6 +23,7 @@ import {
   type Column,
 } from '../../components/ui'
 import { label, orNull } from '../../lib/format'
+import { AddButton, Card } from './shared'
 
 const STATUS_BADGE: Record<OrganizationStatus, string> = {
   TRIAL: 'bg-info',
@@ -30,11 +34,6 @@ const STATUS_BADGE: Record<OrganizationStatus, string> = {
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required').max(150),
-  slug: z
-    .string()
-    .min(1, 'Slug is required')
-    .max(100)
-    .regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers and dashes'),
   status: z.enum(ORGANIZATION_STATUSES),
   email: z.union([z.literal(''), z.string().email('Email must be valid')]),
   phone: z.string().max(30),
@@ -63,7 +62,6 @@ function OrganizationForm({
     resolver: zodResolver(schema),
     defaultValues: {
       name: item?.name ?? '',
-      slug: item?.slug ?? '',
       status: item?.status ?? 'TRIAL',
       email: item?.email ?? '',
       phone: item?.phone ?? '',
@@ -76,7 +74,6 @@ function OrganizationForm({
     setError(null)
     const body = {
       name: v.name.trim(),
-      slug: v.slug.trim(),
       status: v.status,
       email: orNull(v.email),
       phone: orNull(v.phone),
@@ -98,14 +95,9 @@ function OrganizationForm({
         <div className="modal-body">
           {error && <ErrorBox message={error} />}
           <div className="row">
-            <div className="col-md-8">
+            <div className="col-12">
               <Field label="Name" error={errors.name?.message}>
                 <Input {...register('name')} />
-              </Field>
-            </div>
-            <div className="col-md-4">
-              <Field label="Slug" error={errors.slug?.message}>
-                <Input {...register('slug')} />
               </Field>
             </div>
             <div className="col-md-6">
@@ -136,7 +128,7 @@ function OrganizationForm({
             </div>
           </div>
           <Field label="Address" error={errors.address?.message}>
-            <Input {...register('address')} />
+            <Textarea {...register('address')} />
           </Field>
         </div>
         <ModalFooter saving={isSubmitting} onClose={onClose} />
@@ -191,31 +183,33 @@ export default function OrganizationsPage() {
 
   const columns: Column<Organization>[] = [
     { header: 'ID', cell: (o) => o.id },
-    { header: 'Name', cell: (o) => <span className="text-dark font-weight-medium">{o.name}</span> },
-    { header: 'Slug', cell: (o) => o.slug },
-    { header: 'Status', cell: (o) => <span className={`badge ${STATUS_BADGE[o.status]}`}>{label(o.status)}</span> },
-    { header: 'Email', cell: (o) => o.email ?? '-' },
-    { header: 'Owner', cell: (o) => (o.ownerUserId ? `User #${o.ownerUserId}` : <span className="text-muted">Not set</span>) },
+    { header: 'Name', cell: (o) => <span className="text-dark font-weight-medium">{o.name}</span>, value: (o) => o.name },
+    {
+      header: 'Status',
+      cell: (o) => <span className={`badge ${STATUS_BADGE[o.status]}`}>{label(o.status)}</span>,
+      value: (o) => label(o.status),
+    },
+    { header: 'Email', cell: (o) => o.email ?? '-', value: (o) => o.email },
+    {
+      header: 'Owner',
+      cell: (o) => (o.ownerUserId ? `User #${o.ownerUserId}` : <span className="text-muted">Not set</span>),
+      value: (o) => o.ownerUserId,
+    },
     { header: 'Trial ends', cell: (o) => (o.trialEndsAt ? o.trialEndsAt.slice(0, 10) : '-') },
     {
       header: '',
       className: 'text-end text-nowrap',
       cell: (o) => (
         <>
-          <Button variant="secondary" size="sm" className="me-2" onClick={() => setOwnerOf(o)}>
-            Owner
-          </Button>
-          <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(o)}>
-            Edit
-          </Button>
-          <Button
+          <IconButton icon={<UserCheck size={15} />} label="Set owner" className="me-1" onClick={() => setOwnerOf(o)} />
+          <IconButton icon={<Edit2 size={15} />} label="Edit" className="me-1" onClick={() => setEditing(o)} />
+          <IconButton
+            icon={<Trash2 size={15} />}
+            label="Delete"
             variant="danger"
-            size="sm"
             disabled={remove.isPending}
             onClick={() => confirm(`Delete ${o.name}? This removes its data.`) && remove.mutate(o.id)}
-          >
-            Delete
-          </Button>
+          />
         </>
       ),
     },
@@ -223,21 +217,15 @@ export default function OrganizationsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Organizations"
-        trail={['Platform']}
-        actions={<Button onClick={() => setEditing('new')}>Add organization</Button>}
-      />
-      <div className="container-fluid">
-        <div className="card">
-          <div className="card-body">
-            <h4 className="card-title">Client organizations</h4>
-            {error && <ErrorBox message={errorMessage(error)} />}
-            {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
-            <DataTable columns={columns} rows={rows} loading={isLoading} empty="No organizations yet." />
-          </div>
-        </div>
-      </div>
+      <PageHeader title="Organizations" trail={['Platform']} />
+      <Card
+        title="Client organizations"
+        actions={<AddButton onClick={() => setEditing('new')}>Add organization</AddButton>}
+      >
+        {error && <ErrorBox message={errorMessage(error)} />}
+        {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
+        <DataTable datatable columns={columns} rows={rows} loading={isLoading} empty="No organizations yet." />
+      </Card>
       {editing && (
         <OrganizationForm
           item={editing === 'new' ? null : editing}

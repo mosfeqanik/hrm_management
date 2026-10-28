@@ -187,9 +187,9 @@ export interface Organization {
   activatedAt: string | null
   ownerUserId: number | null
 }
-export type OrganizationRequest = Partial<Omit<Organization, 'id' | 'activatedAt' | 'ownerUserId'>> & {
+/** The backend generates the slug from the name on create and keeps it on update. */
+export type OrganizationRequest = Partial<Omit<Organization, 'id' | 'slug' | 'activatedAt' | 'ownerUserId'>> & {
   name: string
-  slug: string
   status: OrganizationStatus
 }
 

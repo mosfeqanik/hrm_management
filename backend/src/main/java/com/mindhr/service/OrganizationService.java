@@ -4,7 +4,6 @@ import com.mindhr.dto.OrganizationRequest;
 import com.mindhr.dto.OrganizationResponse;
 import com.mindhr.entity.Organization;
 import com.mindhr.entity.User;
-import com.mindhr.exception.DuplicateResourceException;
 import com.mindhr.exception.ResourceNotFoundException;
 import com.mindhr.mapper.OrganizationMapper;
 import com.mindhr.repository.OrganizationRepository;
@@ -14,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Platform-managed: {@code Organization} rows are created/edited by SaaS staff during onboarding
@@ -25,6 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class OrganizationService {
+
+    /** Column is 100 chars; leaves room for a "-NNN" suffix. */
+    private static final int MAX_SLUG_BASE = 90;
 
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
@@ -47,11 +51,8 @@ public class OrganizationService {
     public OrganizationResponse create(OrganizationRequest request) {
         TenantContext.requirePlatformStaff();
 
-        if (organizationRepository.existsBySlugIgnoreCase(request.slug())) {
-            throw new DuplicateResourceException("An organization with slug '" + request.slug() + "' already exists");
-        }
-
         Organization organization = new Organization();
+        organization.setSlug(uniqueSlug(request.name()));
         applyRequest(organization, request);
         Organization saved = organizationRepository.save(organization);
         roleProvisioner.provision(saved);
@@ -62,11 +63,7 @@ public class OrganizationService {
     public OrganizationResponse update(Long id, OrganizationRequest request) {
         TenantContext.requirePlatformStaff();
         Organization organization = findEntity(id);
-
-        if (organizationRepository.existsBySlugIgnoreCaseAndIdNot(request.slug(), id)) {
-            throw new DuplicateResourceException("An organization with slug '" + request.slug() + "' already exists");
-        }
-
+        // The slug is set once at creation and kept on rename, so it stays a stable identifier.
         applyRequest(organization, request);
         return OrganizationMapper.toResponse(organization);
     }
@@ -94,7 +91,6 @@ public class OrganizationService {
 
     private void applyRequest(Organization organization, OrganizationRequest request) {
         organization.setName(request.name());
-        organization.setSlug(request.slug());
         organization.setStatus(request.status());
         organization.setEmail(request.email());
         organization.setPhone(request.phone());
@@ -103,6 +99,25 @@ public class OrganizationService {
         if (request.status().name().equals("ACTIVE") && organization.getActivatedAt() == null) {
             organization.setActivatedAt(java.time.LocalDateTime.now());
         }
+    }
+
+    /** "Acme Ltd." -> "acme-ltd"; adds "-2", "-3", ... when the slug is already taken. */
+    private String uniqueSlug(String name) {
+        String base = Normalizer.normalize(name, Normalizer.Form.NFKD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-+|-+$)", "");
+        if (base.isEmpty()) {
+            base = "org";
+        }
+        base = base.substring(0, Math.min(base.length(), MAX_SLUG_BASE)).replaceAll("-+$", "");
+
+        String slug = base;
+        for (int n = 2; organizationRepository.existsBySlugIgnoreCase(slug); n++) {
+            slug = base + "-" + n;
+        }
+        return slug;
     }
 
     private Organization findEntity(Long id) {

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Edit2, Trash2 } from 'react-feather'
 import { z } from 'zod'
 import { errorMessage } from '../../api/client'
 import { organizationsApi, usersApi } from '../../api/platform'
@@ -9,8 +10,8 @@ import type { User, UserType } from '../../api/types'
 import { useResource } from '../../api/useResource'
 import {
   ActiveBadge,
-  Button,
   DataTable,
+  IconButton,
   ErrorBox,
   Field,
   Input,
@@ -21,6 +22,7 @@ import {
   type Column,
 } from '../../components/ui'
 import { label, numOrNull, orNull } from '../../lib/format'
+import { AddButton, Card } from './shared'
 
 const USER_TYPES: UserType[] = ['SUPER_ADMIN', 'SAAS_STAFF', 'ORG_USER']
 
@@ -163,29 +165,30 @@ export default function UsersPage() {
   const [editing, setEditing] = useState<User | 'new' | null>(null)
 
   const columns: Column<User>[] = [
-    { header: 'Name', cell: (u) => <span className="text-dark font-weight-medium">{u.fullName}</span> },
+    { header: 'Name', cell: (u) => <span className="text-dark font-weight-medium">{u.fullName}</span>, value: (u) => u.fullName },
     { header: 'Email', cell: (u) => u.email },
     { header: 'Type', cell: (u) => label(u.userType) },
     { header: 'Organization', cell: (u) => orgName(u.organizationId) },
     { header: 'Roles', cell: (u) => (u.roles.length ? u.roles.map((r) => r.name).join(', ') : '-') },
-    { header: 'Status', cell: (u) => <ActiveBadge active={u.active} /> },
-    { header: 'Last login', cell: (u) => (u.lastLoginAt ? u.lastLoginAt.slice(0, 16).replace('T', ' ') : '-') },
+    { header: 'Status', cell: (u) => <ActiveBadge active={u.active} />, value: (u) => (u.active ? 'Active' : 'Inactive') },
+    {
+      header: 'Last login',
+      cell: (u) => (u.lastLoginAt ? u.lastLoginAt.slice(0, 16).replace('T', ' ') : '-'),
+      value: (u) => u.lastLoginAt,
+    },
     {
       header: '',
       className: 'text-end text-nowrap',
       cell: (u) => (
         <>
-          <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(u)}>
-            Edit
-          </Button>
-          <Button
+          <IconButton icon={<Edit2 size={15} />} label="Edit" className="me-1" onClick={() => setEditing(u)} />
+          <IconButton
+            icon={<Trash2 size={15} />}
+            label="Delete"
             variant="danger"
-            size="sm"
             disabled={remove.isPending}
             onClick={() => confirm(`Delete ${u.fullName}?`) && remove.mutate(u.id)}
-          >
-            Delete
-          </Button>
+          />
         </>
       ),
     },
@@ -193,35 +196,27 @@ export default function UsersPage() {
 
   return (
     <>
-      <PageHeader
-        title="Users"
-        trail={['Platform']}
-        actions={<Button onClick={() => setEditing('new')}>Add user</Button>}
-      />
-      <div className="container-fluid">
-        <div className="card">
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h4 className="card-title mb-0">All users</h4>
-              <select
-                className="form-select w-auto"
-                value={organizationId}
-                onChange={(e) => setOrganizationId(e.target.value)}
-              >
-                <option value="">All organizations</option>
-                {(orgs.data ?? []).map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {error && <ErrorBox message={errorMessage(error)} />}
-            {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
-            <DataTable columns={columns} rows={rows} loading={isLoading} empty="No users found." />
-          </div>
-        </div>
-      </div>
+      <PageHeader title="Users" trail={['Platform']} />
+      <Card
+        title="All users"
+        actions={
+          <>
+            <select className="form-select w-auto" value={organizationId} onChange={(e) => setOrganizationId(e.target.value)}>
+              <option value="">All organizations</option>
+              {(orgs.data ?? []).map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </select>
+            <AddButton onClick={() => setEditing('new')}>Add user</AddButton>
+          </>
+        }
+      >
+        {error && <ErrorBox message={errorMessage(error)} />}
+        {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
+        <DataTable datatable columns={columns} rows={rows} loading={isLoading} empty="No users found." />
+      </Card>
       {editing && (
         <UserForm
           item={editing === 'new' ? null : editing}
