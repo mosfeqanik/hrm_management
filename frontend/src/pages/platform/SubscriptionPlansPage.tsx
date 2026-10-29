@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit2, Trash2 } from 'react-feather'
+import { Edit2, Eye, Trash2 } from 'react-feather'
 import { z } from 'zod'
 import { errorMessage } from '../../api/client'
 import { subscriptionPlansApi } from '../../api/platform'
@@ -10,6 +10,7 @@ import { useResource } from '../../api/useResource'
 import { useAuth } from '../../auth/AuthContext'
 import {
   ActiveBadge,
+  Button,
   DataTable,
   IconButton,
   ErrorBox,
@@ -159,17 +160,73 @@ function PlanForm({ item, onClose, onSaved }: { item: SubscriptionPlan | null; o
   )
 }
 
+const priceText = (p: SubscriptionPlan) =>
+  `${formatMoney(p.price)} ${p.currency ?? ''} / ${p.billingCycle === 'MONTHLY' ? 'month' : 'year'}`
+
+/** Read-only details of a plan, with a shortcut to the edit form. */
+function PlanDetails({
+  plan,
+  canEdit,
+  onClose,
+  onEdit,
+}: {
+  plan: SubscriptionPlan
+  canEdit: boolean
+  onClose: () => void
+  onEdit: () => void
+}) {
+  const rows: [string, React.ReactNode][] = [
+    ['Name', plan.name],
+    ['Description', plan.description || '-'],
+    ['Price', priceText(plan)],
+    ['Billing cycle', label(plan.billingCycle)],
+    ['Max employees', plan.maxEmployees ?? 'No limit'],
+    ['Max branches', plan.maxBranches ?? 'No limit'],
+    ['Trial', `${plan.trialDays} days`],
+    ['Features', plan.features.map(label).join(', ') || '-'],
+    ['Status', <ActiveBadge active={plan.active} />],
+  ]
+  return (
+    <Modal title={plan.name} onClose={onClose}>
+      <div className="modal-body">
+        <table className="table table-sm mb-0">
+          <tbody>
+            {rows.map(([k, v]) => (
+              <tr key={k}>
+                <th className="text-muted fw-normal w-25">{k}</th>
+                <td>{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="modal-footer">
+        <Button variant="secondary" onClick={onClose}>
+          Close
+        </Button>
+        {canEdit && (
+          <Button onClick={onEdit}>
+            <Edit2 size={15} className="me-1" />
+            Edit
+          </Button>
+        )}
+      </div>
+    </Modal>
+  )
+}
+
 export default function SubscriptionPlansPage() {
   const { session } = useAuth()
   const canEdit = session?.userType === 'SUPER_ADMIN'
   const { rows, isLoading, error, remove, refresh } = useResource('subscription-plans', subscriptionPlansApi)
   const [editing, setEditing] = useState<SubscriptionPlan | 'new' | null>(null)
+  const [viewing, setViewing] = useState<SubscriptionPlan | null>(null)
 
   const columns: Column<SubscriptionPlan>[] = [
     { header: 'Name', cell: (p) => <span className="text-dark font-weight-medium">{p.name}</span>, value: (p) => p.name },
     {
       header: 'Price',
-      cell: (p) => `${formatMoney(p.price)} ${p.currency ?? ''} / ${p.billingCycle === 'MONTHLY' ? 'month' : 'year'}`,
+      cell: priceText,
       value: (p) => p.price,
     },
     { header: 'Employees', cell: (p) => p.maxEmployees ?? 'No limit', value: (p) => p.maxEmployees ?? Infinity },
@@ -184,19 +241,23 @@ export default function SubscriptionPlansPage() {
     {
       header: '',
       className: 'text-end text-nowrap',
-      cell: (p) =>
-        canEdit && (
-          <>
-            <IconButton icon={<Edit2 size={15} />} label="Edit" className="me-1" onClick={() => setEditing(p)} />
-            <IconButton
-              icon={<Trash2 size={15} />}
-              label="Delete"
-              variant="danger"
-              disabled={remove.isPending}
-              onClick={() => confirm(`Delete plan ${p.name}?`) && remove.mutate(p.id)}
-            />
-          </>
-        ),
+      cell: (p) => (
+        <>
+          <IconButton icon={<Eye size={15} />} label="View" className="me-1" onClick={() => setViewing(p)} />
+          {canEdit && (
+            <>
+              <IconButton icon={<Edit2 size={15} />} label="Edit" className="me-1" onClick={() => setEditing(p)} />
+              <IconButton
+                icon={<Trash2 size={15} />}
+                label="Delete"
+                variant="danger"
+                disabled={remove.isPending}
+                onClick={() => confirm(`Delete plan ${p.name}?`) && remove.mutate(p.id)}
+              />
+            </>
+          )}
+        </>
+      ),
     },
   ]
 
@@ -208,6 +269,18 @@ export default function SubscriptionPlansPage() {
         {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
         <DataTable datatable columns={columns} rows={rows} loading={isLoading} empty="No plans yet." />
       </Card>
+      {viewing && (
+        <PlanDetails
+          plan={viewing}
+          canEdit={canEdit}
+          onClose={() => setViewing(null)}
+          onEdit={() => {
+            // Swap the details dialog for the edit form of the same plan.
+            setEditing(viewing)
+            setViewing(null)
+          }}
+        />
+      )}
       {editing && (
         <PlanForm
           item={editing === 'new' ? null : editing}

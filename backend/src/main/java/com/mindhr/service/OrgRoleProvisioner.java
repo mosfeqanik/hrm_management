@@ -15,9 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -93,20 +95,22 @@ public class OrgRoleProvisioner {
 
     @Transactional
     public void provision(Organization organization) {
+        // One permission lookup for all five roles: one query per permission was ~150 round trips to the DB.
+        Map<String, Permission> permissions = permissionsByKey();
         for (RoleDef def : DEFINITIONS) {
-            findOrCreate(organization, def);
+            findOrCreate(organization, def, permissions);
         }
     }
 
     /** The organization's EMPLOYEE role, created on demand. */
     @Transactional
     public Role employeeRole(Organization organization) {
-        return findOrCreate(organization, DEFINITIONS.stream().filter(d -> d.name().equals(EMPLOYEE)).findFirst().orElseThrow());
+        return findOrCreate(organization, DEFINITIONS.stream().filter(d -> d.name().equals(EMPLOYEE)).findFirst().orElseThrow(), null);
     }
 
     @Transactional
     public Role ownerRole(Organization organization) {
-        return findOrCreate(organization, DEFINITIONS.stream().filter(d -> d.name().equals(OWNER)).findFirst().orElseThrow());
+        return findOrCreate(organization, DEFINITIONS.stream().filter(d -> d.name().equals(OWNER)).findFirst().orElseThrow(), null);
     }
 
     /** Gives the owner user the ORG_OWNER role if they do not have it yet. */
@@ -118,9 +122,11 @@ public class OrgRoleProvisioner {
         }
     }
 
-    private Role findOrCreate(Organization organization, RoleDef def) {
+    /** {@code cache} is the result of {@link #permissionsByKey()}, or null to load it only if the role is created. */
+    private Role findOrCreate(Organization organization, RoleDef def, Map<String, Permission> cache) {
         return roleRepository.findByOrganizationIdAndNameIgnoreCase(organization.getId(), def.name())
                 .orElseGet(() -> {
+                    Map<String, Permission> known = cache != null ? cache : permissionsByKey();
                     Role role = new Role();
                     role.setOrganization(organization);
                     role.setName(def.name());
@@ -129,14 +135,27 @@ public class OrgRoleProvisioner {
                     role.setDataScope(def.dataScope());
                     role.setSystem(true);
                     Set<Permission> permissions = new HashSet<>();
-                    def.grants().forEach((module, acts) -> acts.forEach(a -> permissions.add(permission(module, a))));
+                    def.grants().forEach((module, acts) -> acts.forEach(a -> permissions.add(permission(known, module, a))));
                     role.setPermissions(permissions);
                     return roleRepository.save(role);
                 });
     }
 
-    private Permission permission(String module, PermissionAction action) {
-        return permissionRepository.findByModuleIgnoreCaseAndAction(module, action).orElseGet(() -> {
+    private Map<String, Permission> permissionsByKey() {
+        Map<String, Permission> byKey = new HashMap<>();
+        for (Permission p : permissionRepository.findAll()) {
+            byKey.putIfAbsent(key(p.getModule(), p.getAction()), p);
+        }
+        return byKey;
+    }
+
+    private static String key(String module, PermissionAction action) {
+        return module.toUpperCase(Locale.ROOT) + "_" + action.name();
+    }
+
+    /** Looks the permission up in {@code known}; creates (and remembers) it when missing. */
+    private Permission permission(Map<String, Permission> known, String module, PermissionAction action) {
+        return known.computeIfAbsent(key(module, action), k -> {
             Permission permission = new Permission();
             permission.setModule(module);
             permission.setAction(action);

@@ -259,3 +259,17 @@ ul.list-style-none li a:hover {
   height: 34px;
   width: auto;
 }
+
+/* Form dialogs wrap .modal-body and .modal-footer in a <form>. Bootstrap's scrollable modal only
+   scrolls a .modal-body that is a direct child of .modal-content, so let the form pass the flex
+   layout through; otherwise tall forms push the footer buttons off the screen. */
+.modal-dialog-scrollable .modal-content > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.modal-dialog-scrollable .modal-content > form > .modal-body {
+  overflow-y: auto;
+}

@@ -14,6 +14,8 @@ public record OrganizationResponse(
         String address,
         LocalDateTime trialEndsAt,
         LocalDateTime activatedAt,
-        Long ownerUserId
+        Long ownerUserId,
+        String ownerName,
+        String ownerEmail
 ) {
 }

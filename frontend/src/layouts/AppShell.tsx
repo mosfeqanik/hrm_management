@@ -1,5 +1,4 @@
 import { Fragment, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   Briefcase,
@@ -23,7 +22,6 @@ import {
   Users,
 } from 'react-feather'
 import type { ComponentType } from 'react'
-import { organizationsApi } from '../api/platform'
 import { useAuth } from '../auth/AuthContext'
 import { PageHeader } from '../components/ui'
 
@@ -63,28 +61,6 @@ const NAV: NavItem[] = [
 ]
 
 const SECTION_TITLES: Record<Section, string> = { platform: 'Platform', account: 'Client account', modules: 'HR modules' }
-
-/** Top bar picker: which organization a platform user is working in. */
-function OrgPicker() {
-  const { orgId, setOrgId } = useAuth()
-  const { data } = useQuery({ queryKey: ['organizations', null], queryFn: () => organizationsApi.list() })
-  return (
-    <select
-      className="form-select form-select-sm"
-      style={{ minWidth: 220 }}
-      aria-label="Organization"
-      value={orgId ?? ''}
-      onChange={(e) => setOrgId(e.target.value ? Number(e.target.value) : null)}
-    >
-      <option value="">Select organization...</option>
-      {(data ?? []).map((o) => (
-        <option key={o.id} value={o.id}>
-          {o.name}
-        </option>
-      ))}
-    </select>
-  )
-}
 
 function OrgRequired() {
   return (
@@ -173,18 +149,7 @@ export function AppShell() {
             </a>
           </div>
           <div className={`navbar-collapse collapse ${navOpen ? 'show' : ''}`} id="navbarSupportedContent">
-            <ul className="navbar-nav float-start me-auto ms-3 ps-1">
-              {isPlatform && (
-                <li className="nav-item d-flex align-items-center me-3">
-                  <OrgPicker />
-                </li>
-              )}
-              <li className="nav-item d-none d-md-block">
-                <span className="nav-link text-muted">
-                  {session?.userType.replace('_', ' ')} &middot; scope {session?.dataScope}
-                </span>
-              </li>
-            </ul>
+            <ul className="navbar-nav float-start me-auto ms-3 ps-1" />
             <ul className="navbar-nav float-end">
               <li className={`nav-item dropdown ${userMenu ? 'show' : ''}`}>
                 <a className="nav-link dropdown-toggle" role="button" onClick={() => setUserMenu((v) => !v)}>
@@ -234,7 +199,7 @@ export function AppShell() {
         onClick={() => userMenu && setUserMenu(false)}
       >
         {needsOrg ? <OrgRequired /> : <Outlet />}
-        <footer className="footer text-center text-muted">mindHR &middot; built on FreeDash</footer>
+        <footer className="footer text-center text-muted">mindHR &middot; Copyright &copy; 2026 Vitality Solution</footer>
       </div>
     </div>
   )

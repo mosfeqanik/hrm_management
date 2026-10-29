@@ -3,6 +3,7 @@ package com.mindhr.service;
 import com.mindhr.dto.OrganizationRequest;
 import com.mindhr.dto.OrganizationResponse;
 import com.mindhr.entity.Organization;
+import com.mindhr.entity.Subscription;
 import com.mindhr.entity.User;
 import com.mindhr.exception.ResourceNotFoundException;
 import com.mindhr.mapper.OrganizationMapper;
@@ -33,6 +34,7 @@ public class OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final OrgRoleProvisioner roleProvisioner;
+    private final SubscriptionService subscriptionService;
 
     public List<OrganizationResponse> listAll() {
         TenantContext.requirePlatformStaff();
@@ -50,12 +52,18 @@ public class OrganizationService {
     @Transactional
     public OrganizationResponse create(OrganizationRequest request) {
         TenantContext.requirePlatformStaff();
+        if (request.planId() == null) {
+            throw new IllegalArgumentException("Subscription plan is required");
+        }
 
         Organization organization = new Organization();
         organization.setSlug(uniqueSlug(request.name()));
         applyRequest(organization, request);
         Organization saved = organizationRepository.save(organization);
         roleProvisioner.provision(saved);
+        // Every organization starts with a subscription; keep the trial end in step with it.
+        Subscription subscription = subscriptionService.createInitial(saved, request.planId(), request.trialEndsAt());
+        saved.setTrialEndsAt(subscription.getTrialEndsAt());
         return OrganizationMapper.toResponse(saved);
     }
 

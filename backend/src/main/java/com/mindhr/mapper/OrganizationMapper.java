@@ -2,6 +2,7 @@ package com.mindhr.mapper;
 
 import com.mindhr.dto.OrganizationResponse;
 import com.mindhr.entity.Organization;
+import com.mindhr.entity.User;
 
 public final class OrganizationMapper {
 
@@ -9,6 +10,7 @@ public final class OrganizationMapper {
     }
 
     public static OrganizationResponse toResponse(Organization organization) {
+        User owner = organization.getOwner();
         return new OrganizationResponse(
                 organization.getId(),
                 organization.getName(),
@@ -19,7 +21,9 @@ public final class OrganizationMapper {
                 organization.getAddress(),
                 organization.getTrialEndsAt(),
                 organization.getActivatedAt(),
-                organization.getOwner() != null ? organization.getOwner().getId() : null
+                owner != null ? owner.getId() : null,
+                owner != null ? owner.getFullName() : null,
+                owner != null ? owner.getEmail() : null
         );
     }
 }

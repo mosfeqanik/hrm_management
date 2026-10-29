@@ -11,6 +11,7 @@ import com.mindhr.entity.Subscription;
 import com.mindhr.entity.SubscriptionHistory;
 import com.mindhr.entity.SubscriptionPlan;
 import com.mindhr.entity.User;
+import com.mindhr.entity.enums.OrganizationStatus;
 import com.mindhr.entity.enums.SubscriptionStatus;
 import com.mindhr.exception.ResourceNotFoundException;
 import com.mindhr.mapper.SubscriptionHistoryMapper;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -83,6 +85,34 @@ public class SubscriptionService {
         subscription = subscriptionRepository.save(subscription);
         recordHistory(subscription, null, subscription.getStatus(), plan, plan, "Subscription created");
         return SubscriptionMapper.toResponse(subscription);
+    }
+
+    /**
+     * The first subscription, created together with the organization. TRIAL when the organization
+     * is on trial, otherwise ACTIVE. Without an explicit trial end, the plan's trial days are used.
+     */
+    @Transactional
+    public Subscription createInitial(Organization organization, Long planId, LocalDateTime trialEndsAt) {
+        SubscriptionPlan plan = findPlan(planId);
+        if (!plan.isActive()) {
+            throw new IllegalArgumentException("Subscription plan is not active: " + plan.getName());
+        }
+        if (trialEndsAt == null && plan.getTrialDays() > 0) {
+            trialEndsAt = LocalDateTime.now().plusDays(plan.getTrialDays());
+        }
+
+        Subscription subscription = new Subscription();
+        subscription.setOrganization(organization);
+        subscription.setPlan(plan);
+        subscription.setStatus(organization.getStatus() == OrganizationStatus.TRIAL
+                ? SubscriptionStatus.TRIAL : SubscriptionStatus.ACTIVE);
+        subscription.setStartDate(LocalDate.now());
+        subscription.setTrialEndsAt(trialEndsAt);
+        subscription.setAutoRenew(true);
+
+        subscription = subscriptionRepository.save(subscription);
+        recordHistory(subscription, null, subscription.getStatus(), plan, plan, "Subscription created with organization");
+        return subscription;
     }
 
     @Transactional

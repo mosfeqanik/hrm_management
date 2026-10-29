@@ -27,6 +27,9 @@ public record OrganizationRequest(
         @Size(max = 500, message = "Address must be at most 500 characters")
         String address,
 
-        LocalDateTime trialEndsAt
+        LocalDateTime trialEndsAt,
+
+        /** Required on create: the organization starts with a subscription to this plan. Ignored on update. */
+        Long planId
 ) {
 }

@@ -119,6 +119,24 @@
   --bs-focus-ring-color: var(--mh-focus-ring);
 }
 
+/* The template sets the dropdown colors on .dropdown-menu itself (active = #5f76e8), so :root does not reach them. */
+.dropdown-menu {
+  --bs-dropdown-link-active-bg: var(--mh-primary);
+  --bs-dropdown-link-active-color: var(--mh-white);
+  --bs-dropdown-link-hover-bg: var(--mh-primary);
+  --bs-dropdown-link-hover-color: var(--mh-white);
+}
+/* User menu: no white frame around the items, so a hovered item fills the whole box. */
+.dropdown-menu.user-dd {
+  --bs-dropdown-padding-y: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.dropdown-menu .dropdown-item:hover .svg-icon,
+.dropdown-menu .dropdown-item:active .svg-icon {
+  color: inherit;
+}
+
 /* ---------- Utility classes ---------- */
 .text-mh-primary {
   color: var(--mh-primary) !important;

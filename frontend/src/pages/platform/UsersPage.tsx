@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit2, Trash2 } from 'react-feather'
+import { Edit2, Eye, Trash2 } from 'react-feather'
 import { z } from 'zod'
 import { errorMessage } from '../../api/client'
 import { organizationsApi, usersApi } from '../../api/platform'
@@ -10,6 +10,7 @@ import type { User, UserType } from '../../api/types'
 import { useResource } from '../../api/useResource'
 import {
   ActiveBadge,
+  Button,
   DataTable,
   IconButton,
   ErrorBox,
@@ -152,6 +153,57 @@ function UserForm({ item, onClose, onSaved }: { item: User | null; onClose: () =
   )
 }
 
+const formatDateTime = (v: string | null | undefined) => (v ? v.slice(0, 16).replace('T', ' ') : '-')
+
+/** Read-only details of a user; the table shows only the main columns. */
+function UserDetails({
+  user,
+  orgName,
+  onClose,
+  onEdit,
+}: {
+  user: User
+  orgName: string
+  onClose: () => void
+  onEdit: () => void
+}) {
+  const rows: [string, React.ReactNode][] = [
+    ['Full name', user.fullName],
+    ['Email', user.email],
+    ['Phone', user.phone ?? '-'],
+    ['Type', label(user.userType)],
+    ['Organization', orgName],
+    ['Roles', user.roles.length ? user.roles.map((r) => r.name).join(', ') : '-'],
+    ['Status', <ActiveBadge active={user.active} />],
+    ['Last login', formatDateTime(user.lastLoginAt)],
+  ]
+  return (
+    <Modal title={user.fullName} onClose={onClose}>
+      <div className="modal-body">
+        <table className="table table-sm mb-0">
+          <tbody>
+            {rows.map(([k, v]) => (
+              <tr key={k}>
+                <th className="text-muted fw-normal w-25">{k}</th>
+                <td>{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="modal-footer">
+        <Button variant="secondary" onClick={onClose}>
+          Close
+        </Button>
+        <Button onClick={onEdit}>
+          <Edit2 size={15} className="me-1" />
+          Edit
+        </Button>
+      </div>
+    </Modal>
+  )
+}
+
 export default function UsersPage() {
   const [organizationId, setOrganizationId] = useState('')
   const orgs = useQuery({ queryKey: ['organizations', null], queryFn: () => organizationsApi.list() })
@@ -163,24 +215,19 @@ export default function UsersPage() {
     organizationId ? { organizationId: Number(organizationId) } : undefined,
   )
   const [editing, setEditing] = useState<User | 'new' | null>(null)
+  const [viewing, setViewing] = useState<User | null>(null)
 
   const columns: Column<User>[] = [
     { header: 'Name', cell: (u) => <span className="text-dark font-weight-medium">{u.fullName}</span>, value: (u) => u.fullName },
-    { header: 'Email', cell: (u) => u.email },
-    { header: 'Type', cell: (u) => label(u.userType) },
     { header: 'Organization', cell: (u) => orgName(u.organizationId) },
     { header: 'Roles', cell: (u) => (u.roles.length ? u.roles.map((r) => r.name).join(', ') : '-') },
     { header: 'Status', cell: (u) => <ActiveBadge active={u.active} />, value: (u) => (u.active ? 'Active' : 'Inactive') },
-    {
-      header: 'Last login',
-      cell: (u) => (u.lastLoginAt ? u.lastLoginAt.slice(0, 16).replace('T', ' ') : '-'),
-      value: (u) => u.lastLoginAt,
-    },
     {
       header: '',
       className: 'text-end text-nowrap',
       cell: (u) => (
         <>
+          <IconButton icon={<Eye size={15} />} label="View" className="me-1" onClick={() => setViewing(u)} />
           <IconButton icon={<Edit2 size={15} />} label="Edit" className="me-1" onClick={() => setEditing(u)} />
           <IconButton
             icon={<Trash2 size={15} />}
@@ -217,6 +264,18 @@ export default function UsersPage() {
         {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
         <DataTable datatable columns={columns} rows={rows} loading={isLoading} empty="No users found." />
       </Card>
+      {viewing && (
+        <UserDetails
+          user={viewing}
+          orgName={orgName(viewing.organizationId)}
+          onClose={() => setViewing(null)}
+          onEdit={() => {
+            // Swap the details dialog for the edit form of the same user.
+            setEditing(viewing)
+            setViewing(null)
+          }}
+        />
+      )}
       {editing && (
         <UserForm
           item={editing === 'new' ? null : editing}
