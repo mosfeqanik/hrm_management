@@ -19,6 +19,7 @@ import {
   Modal,
   ModalFooter,
   PageHeader,
+  PasswordInput,
   Select,
   type Column,
 } from '../../components/ui'
@@ -108,7 +109,7 @@ function UserForm({ item, onClose, onSaved }: { item: User | null; onClose: () =
             </div>
             <div className="col-md-6">
               <Field label={item ? 'New password (leave empty to keep)' : 'Password'} error={errors.password?.message}>
-                <Input type="password" autoComplete="new-password" {...register('password')} />
+                <PasswordInput autoComplete="new-password" {...register('password')} />
               </Field>
             </div>
             <div className="col-md-6">

@@ -21,4 +21,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     boolean existsByOrganizationIdAndEmployeeCodeIgnoreCase(Long organizationId, String employeeCode);
 
     boolean existsByOrganizationIdAndEmployeeCodeIgnoreCaseAndIdNot(Long organizationId, String employeeCode, Long id);
+
+    /** Email is unique across all organizations (it is also the employee's login). */
+    boolean existsByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+
+    /** Phone is unique within an organization. */
+    boolean existsByOrganizationIdAndPhone(Long organizationId, String phone);
+
+    boolean existsByOrganizationIdAndPhoneAndIdNot(Long organizationId, String phone, Long id);
 }

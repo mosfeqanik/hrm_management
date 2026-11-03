@@ -19,6 +19,7 @@ import {
   Modal,
   ModalFooter,
   PageHeader,
+  PasswordInput,
   Select,
   type Column,
 } from '../../components/ui'
@@ -310,7 +311,7 @@ function OwnerModal({ org, onClose, onSaved }: { org: Organization; onClose: () 
               </div>
               <div className="col-md-6">
                 <Field label="Password" error={errors.password?.message}>
-                  <Input type="password" autoComplete="new-password" {...register('password')} />
+                  <PasswordInput autoComplete="new-password" {...register('password')} />
                 </Field>
               </div>            </div>
           )}

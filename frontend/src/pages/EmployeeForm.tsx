@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { employeesApi } from '../api/employees'
 import { errorMessage } from '../api/client'
 import { EMPLOYMENT_TYPES, type Employee, type EmployeeRequest } from '../api/types'
-import { Button, ErrorBox, Field, Input, Modal, Select } from '../components/ui'
+import { Button, ErrorBox, Field, Input, Modal, PasswordInput, Select } from '../components/ui'
 
 const schema = z.object({
   fullName: z.string().min(1, 'Full name is required').max(150),
@@ -121,7 +121,7 @@ export default function EmployeeForm({
             {!employee && (
               <div className="col-md-6">
                 <Field label="Initial password (login)" error={errors.password?.message}>
-                  <Input type="password" autoComplete="new-password" {...register('password')} />
+                  <PasswordInput autoComplete="new-password" {...register('password')} />
                 </Field>
               </div>
             )}

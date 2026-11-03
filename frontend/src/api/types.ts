@@ -351,6 +351,13 @@ export const PLAN_FEATURES = [
   'ADVANCED_PERMISSIONS',
 ] as const
 export type PlanFeature = (typeof PLAN_FEATURES)[number]
+/** GET /api/subscriptions/current: empty features when the organization has no usable subscription. */
+export interface CurrentPlan {
+  planId: number | null
+  planName: string | null
+  status: SubscriptionStatus | null
+  features: PlanFeature[]
+}
 
 export interface SubscriptionPlan {
   id: number

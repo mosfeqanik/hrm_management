@@ -5362,6 +5362,32 @@
           }
         },
         {
+          "name": "GET /api/subscriptions/current",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subscriptions/current?organizationId=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscriptions",
+                "current"
+              ],
+              "query": [
+                {
+                  "key": "organizationId",
+                  "value": "{{organizationId}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "The plan the organization can use now, with its features (org users: their own organization)."
+          }
+        },
+        {
           "name": "GET /api/subscriptions/{id}",
           "request": {
             "method": "GET",

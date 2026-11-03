@@ -22,6 +22,9 @@ import {
   Users,
 } from 'react-feather'
 import type { ComponentType } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { subscriptionsApi } from '../api/platform'
+import type { PlanFeature } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
 import { PageHeader } from '../components/ui'
 
@@ -36,6 +39,8 @@ interface NavItem {
   /** Platform users must pick an organization in the top bar before opening it. */
   orgScoped?: boolean
   superAdminOnly?: boolean
+  /** Shown only when the organization's subscription plan includes this feature. */
+  feature?: PlanFeature
 }
 
 // 'platform' and 'account' entries are for SaaS-side users (SUPER_ADMIN / SAAS_STAFF);
@@ -53,11 +58,11 @@ const NAV: NavItem[] = [
   { to: '/employees', label: 'Employees', icon: Users, section: 'modules', permission: 'EMPLOYEE_VIEW', orgScoped: true },
   { to: '/branches', label: 'Branches', icon: MapPin, section: 'modules', permission: 'BRANCH_VIEW', orgScoped: true },
   { to: '/departments', label: 'Departments', icon: Grid, section: 'modules', permission: 'DEPARTMENT_VIEW', orgScoped: true },
-  { to: '/attendance', label: 'Attendance', icon: Clock, section: 'modules', permission: 'ATTENDANCE_VIEW', orgScoped: true },
-  { to: '/shifts', label: 'Shifts', icon: Calendar, section: 'modules', permission: 'SHIFT_VIEW', orgScoped: true },
-  { to: '/leave', label: 'Leave', icon: Briefcase, section: 'modules', permission: 'LEAVE_VIEW', orgScoped: true },
-  { to: '/payroll', label: 'Payroll', icon: DollarSign, section: 'modules', permission: 'PAYROLL_VIEW', orgScoped: true },
-  { to: '/assets', label: 'Assets', icon: Box, section: 'modules', permission: 'ASSET_VIEW', orgScoped: true },
+  { to: '/attendance', label: 'Attendance', icon: Clock, section: 'modules', permission: 'ATTENDANCE_VIEW', orgScoped: true, feature: 'ATTENDANCE' },
+  { to: '/shifts', label: 'Shifts', icon: Calendar, section: 'modules', permission: 'SHIFT_VIEW', orgScoped: true, feature: 'SHIFTS' },
+  { to: '/leave', label: 'Leave', icon: Briefcase, section: 'modules', permission: 'LEAVE_VIEW', orgScoped: true, feature: 'LEAVE' },
+  { to: '/payroll', label: 'Payroll', icon: DollarSign, section: 'modules', permission: 'PAYROLL_VIEW', orgScoped: true, feature: 'PAYROLL' },
+  { to: '/assets', label: 'Assets', icon: Box, section: 'modules', permission: 'ASSET_VIEW', orgScoped: true, feature: 'ASSETS' },
 ]
 
 const SECTION_TITLES: Record<Section, string> = { platform: 'Platform', account: 'Client account', modules: 'HR modules' }
@@ -86,8 +91,19 @@ export function AppShell() {
   const isSuperAdmin = session?.userType === 'SUPER_ADMIN'
   const isActive = (to: string) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to))
 
+  // The organization's plan decides which feature modules show. A platform user without an
+  // organization has no plan to check, so they see every module.
+  const hasOrg = !isPlatform || orgId != null
+  const plan = useQuery({
+    queryKey: ['current-plan', isPlatform ? orgId : 'own'],
+    queryFn: () => subscriptionsApi.current(),
+    enabled: hasOrg,
+  })
+  const planAllows = (f: PlanFeature) => !hasOrg || (plan.data?.features.includes(f) ?? false)
+
   const visible = (n: NavItem) => {
     if (n.section === 'platform' || n.section === 'account') return isPlatform && (!n.superAdminOnly || isSuperAdmin)
+    if (n.feature && !planAllows(n.feature)) return false
     return !n.permission || can(n.permission)
   }
   const items = NAV.filter(visible)
