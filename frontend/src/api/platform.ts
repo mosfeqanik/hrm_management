@@ -2,6 +2,7 @@ import { api } from './client'
 import { crud } from './crud'
 import type {
   Contract,
+  CurrentPlan,
   ContractHistory,
   ContractRequest,
   ContractStatus,
@@ -45,6 +46,7 @@ export const subscriptionPlansApi = crud<SubscriptionPlan, SubscriptionPlanReque
 const subs = '/api/subscriptions'
 export const subscriptionsApi = {
   list: () => api.get<Subscription[]>(subs).then((r) => r.data),
+  current: () => api.get<CurrentPlan>(`${subs}/current`).then((r) => r.data),
   create: (body: SubscriptionRequest) => api.post<Subscription>(subs, body).then((r) => r.data),
   update: (id: number, body: SubscriptionUpdateRequest) =>
     api.put<Subscription>(`${subs}/${id}`, body).then((r) => r.data),

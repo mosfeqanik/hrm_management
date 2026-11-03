@@ -97,11 +97,20 @@ ul.list-style-none li a:hover {
   --bs-btn-active-bg: var(--mh-primary-subtle);
   --bs-btn-active-border-color: var(--mh-primary);
 }
+/* Filled buttons need white text: the .btn rule above makes text dark by default. */
 .btn-success {
+  --bs-btn-color: var(--mh-white);
+  --bs-btn-hover-color: var(--mh-white);
+  --bs-btn-active-color: var(--mh-white);
+  --bs-btn-disabled-color: var(--mh-white);
   --bs-btn-bg: var(--mh-success);
   --bs-btn-border-color: var(--mh-success);
 }
 .btn-danger {
+  --bs-btn-color: var(--mh-white);
+  --bs-btn-hover-color: var(--mh-white);
+  --bs-btn-active-color: var(--mh-white);
+  --bs-btn-disabled-color: var(--mh-white);
   --bs-btn-bg: var(--mh-danger);
   --bs-btn-border-color: var(--mh-danger);
 }
@@ -258,4 +267,31 @@ ul.list-style-none li a:hover {
 .navbar-brand .mh-brand-logo {
   height: 34px;
   width: auto;
+}
+
+/* Form dialogs wrap .modal-body and .modal-footer in a <form>. Bootstrap's scrollable modal only
+   scrolls a .modal-body that is a direct child of .modal-content, so let the form pass the flex
+   layout through; otherwise tall forms push the footer buttons off the screen. */
+.modal-dialog-scrollable .modal-content > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.modal-dialog-scrollable .modal-content > form > .modal-body {
+  overflow-y: auto;
+}
+
+/* The template scrolls the sidebar with a JS plugin we do not load; let it scroll natively so the
+   lower menu items are reachable on short screens. */
+.left-sidebar .scroll-sidebar {
+  overflow-y: auto;
+}
+
+/* Top bar user menu ("Hello, <name>"): one text color, the same as the name, with no hover change. */
+.topbar .navbar-nav .nav-item.dropdown > .nav-link,
+.topbar .navbar-nav .nav-item.dropdown > .nav-link:hover,
+.topbar .navbar-nav .nav-item.dropdown > .nav-link:focus {
+  color: var(--mh-text);
 }

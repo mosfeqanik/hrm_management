@@ -71,6 +71,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Organization not found: " + organizationId));
 
         planLimitService.assertCanAddEmployee(organizationId);
+        assertUniqueContact(request, organizationId, null, null);
 
         Employee employee = new Employee();
         employee.setOrganization(organization);
@@ -101,6 +102,7 @@ public class EmployeeService {
         if (request.employeeCode() != null && !request.employeeCode().isBlank()) {
             employee.setEmployeeCode(resolveEmployeeCode(request.employeeCode(), organizationId, employee.getId()));
         }
+        assertUniqueContact(request, organizationId, employee.getId(), idOf(employee.getUser()));
         applyRequest(employee, request, organizationId);
 
         if (!Objects.equals(oldPosition, employee.getPosition())) {
@@ -139,6 +141,38 @@ public class EmployeeService {
         employee.setEmploymentType(request.employmentType());
         employee.setJoinedAt(request.joinedAt());
         employee.setActive(request.active() == null || request.active());
+    }
+
+    /**
+     * Email must be unique across all employees and logins (it is the login); phone must be unique
+     * within the organization. {@code selfId} / {@code selfUserId} exclude the employee being updated.
+     */
+    private void assertUniqueContact(EmployeeRequest request, Long organizationId, Long selfId, Long selfUserId) {
+        String email = request.email() == null ? null : request.email().trim();
+        if (email != null && !email.isEmpty()) {
+            boolean employeeTaken = selfId == null
+                    ? employeeRepository.existsByEmailIgnoreCase(email)
+                    : employeeRepository.existsByEmailIgnoreCaseAndIdNot(email, selfId);
+            boolean userTaken = selfUserId == null
+                    ? userRepository.existsByEmailIgnoreCase(email)
+                    : userRepository.existsByEmailIgnoreCaseAndIdNot(email, selfUserId);
+            // A new employee may be linked to an existing login (userId); that login's own email is fine.
+            if (userTaken && selfUserId == null && request.userId() != null) {
+                userTaken = userRepository.existsByEmailIgnoreCaseAndIdNot(email, request.userId());
+            }
+            if (employeeTaken || userTaken) {
+                throw new DuplicateResourceException("Email '" + email + "' is already used by another employee or user");
+            }
+        }
+        String phone = request.phone() == null ? null : request.phone().trim();
+        if (phone != null && !phone.isEmpty()) {
+            boolean taken = selfId == null
+                    ? employeeRepository.existsByOrganizationIdAndPhone(organizationId, phone)
+                    : employeeRepository.existsByOrganizationIdAndPhoneAndIdNot(organizationId, phone, selfId);
+            if (taken) {
+                throw new DuplicateResourceException("Phone '" + phone + "' is already used by another employee in this organization");
+            }
+        }
     }
 
     /** Creates the mobile-app login for a new employee and gives it the EMPLOYEE role. */

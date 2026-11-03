@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useMemo, useState } from 'react'
+import { Eye, EyeOff } from 'react-feather'
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -51,6 +52,32 @@ export function Field({ label, error, children }: { label: string; error?: strin
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>((props, ref) => (
   <input ref={ref} {...props} className={`form-control ${props.className ?? ''}`} />
 ))
+
+/** Password field with an eye button that shows or hides the text. */
+export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>>(
+  (props, ref) => {
+    const [visible, setVisible] = useState(false)
+    return (
+      <div className="input-group">
+        <input
+          ref={ref}
+          {...props}
+          type={visible ? 'text' : 'password'}
+          className={`form-control ${props.className ?? ''}`}
+        />
+        <button
+          type="button"
+          className="btn btn-outline-secondary"
+          aria-label={visible ? 'Hide password' : 'Show password'}
+          title={visible ? 'Hide password' : 'Show password'}
+          onClick={() => setVisible((v) => !v)}
+        >
+          {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
+      </div>
+    )
+  },
+)
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>((props, ref) => (
   <textarea ref={ref} rows={3} {...props} className={`form-control ${props.className ?? ''}`} />

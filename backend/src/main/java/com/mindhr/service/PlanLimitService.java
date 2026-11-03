@@ -1,5 +1,6 @@
 package com.mindhr.service;
 
+import com.mindhr.dto.CurrentPlanResponse;
 import com.mindhr.entity.Subscription;
 import com.mindhr.entity.SubscriptionPlan;
 import com.mindhr.entity.enums.PlanFeature;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Enforces what an organization's subscription plan allows: employee and branch limits and
@@ -59,11 +62,24 @@ public class PlanLimitService {
         }
     }
 
+    /** What the organization's current plan includes; the web app shows only those modules. */
+    @Transactional(readOnly = true)
+    public CurrentPlanResponse currentPlanInfo(Long organizationId) {
+        return currentSubscription(organizationId)
+                .map(s -> new CurrentPlanResponse(s.getPlan().getId(), s.getPlan().getName(), s.getStatus(),
+                        Set.copyOf(s.getPlan().getFeatures())))
+                .orElseGet(() -> new CurrentPlanResponse(null, null, null, Set.of()));
+    }
+
     private SubscriptionPlan currentPlan(Long organizationId) {
-        return subscriptionRepository.findByOrganizationIdAndStatusIn(organizationId, USABLE_STATUSES).stream()
-                .max(Comparator.comparing(Subscription::getCreatedAt))
+        return currentSubscription(organizationId)
                 .map(Subscription::getPlan)
                 .orElseThrow(() -> new PlanLimitExceededException(
                         "Organization has no active subscription"));
+    }
+
+    private Optional<Subscription> currentSubscription(Long organizationId) {
+        return subscriptionRepository.findByOrganizationIdAndStatusIn(organizationId, USABLE_STATUSES).stream()
+                .max(Comparator.comparing(Subscription::getCreatedAt));
     }
 }

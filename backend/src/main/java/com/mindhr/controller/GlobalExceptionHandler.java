@@ -3,6 +3,7 @@ package com.mindhr.controller;
 import com.mindhr.exception.DuplicateResourceException;
 import com.mindhr.exception.PlanLimitExceededException;
 import com.mindhr.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Maps auth/validation exceptions to JSON error bodies instead of the default HTML error page. */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -47,6 +49,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        // The client gets a generic message; the database's own reason goes to the log.
+        log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
         return errorBody(HttpStatus.CONFLICT, "This action conflicts with an existing record or a reference to it");
     }
 

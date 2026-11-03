@@ -186,11 +186,15 @@ export interface Organization {
   trialEndsAt: string | null
   activatedAt: string | null
   ownerUserId: number | null
+  ownerName: string | null
+  ownerEmail: string | null
 }
 /** The backend generates the slug from the name on create and keeps it on update. */
-export type OrganizationRequest = Partial<Omit<Organization, 'id' | 'slug' | 'activatedAt' | 'ownerUserId'>> & {
+export type OrganizationRequest = Partial<Omit<Organization, 'id' | 'slug' | 'activatedAt' | 'ownerUserId' | 'ownerName' | 'ownerEmail'>> & {
   name: string
   status: OrganizationStatus
+  /** Required on create: the plan of the organization's first subscription. */
+  planId?: number
 }
 
 export interface User {
@@ -347,6 +351,13 @@ export const PLAN_FEATURES = [
   'ADVANCED_PERMISSIONS',
 ] as const
 export type PlanFeature = (typeof PLAN_FEATURES)[number]
+/** GET /api/subscriptions/current: empty features when the organization has no usable subscription. */
+export interface CurrentPlan {
+  planId: number | null
+  planName: string | null
+  status: SubscriptionStatus | null
+  features: PlanFeature[]
+}
 
 export interface SubscriptionPlan {
   id: number
