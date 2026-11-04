@@ -40,7 +40,7 @@ export default function BranchesPage() {
             {error && <ErrorBox message={errorMessage(error)} />}
             {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
             <div className="table-responsive">
-              <table className="table table-hover align-middle">
+              <table className="table table-hover align-middle mh-stack">
                 <thead>
                   <tr>
                     {COLUMNS.map((h, i) => (
@@ -67,22 +67,22 @@ export default function BranchesPage() {
                   )}
                   {rows.map((b) => (
                     <tr key={b.id}>
-                      <td>{b.code ?? '-'}</td>
-                      <td className="font-weight-medium text-dark">{b.name}</td>
-                      <td>{b.address ?? '-'}</td>
-                      <td>{b.phone ?? '-'}</td>
-                      <td>{nameOf(b.managerId)}</td>
-                      <td>
+                      <td data-label={COLUMNS[0]}>{b.code ?? '-'}</td>
+                      <td data-label={COLUMNS[1]} className="font-weight-medium text-dark">{b.name}</td>
+                      <td data-label={COLUMNS[2]}>{b.address ?? '-'}</td>
+                      <td data-label={COLUMNS[3]}>{b.phone ?? '-'}</td>
+                      <td data-label={COLUMNS[4]}>{nameOf(b.managerId)}</td>
+                      <td data-label={COLUMNS[5]}>
                         {b.latitude != null && b.longitude != null
                           ? `${b.latitude}, ${b.longitude} (${b.geofenceRadiusM ?? '-'} m)`
                           : '-'}
                       </td>
-                      <td>
+                      <td data-label={COLUMNS[6]}>
                         <span className={`badge ${b.active ? 'bg-success' : 'bg-secondary'}`}>
                           {b.active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="text-end text-nowrap">
+                      <td data-label={COLUMNS[7]} className="text-end text-nowrap">
                         <Can permission="BRANCH_UPDATE">
                           <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(b)}>
                             Edit

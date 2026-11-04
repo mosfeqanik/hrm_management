@@ -9,5 +9,7 @@ public enum RequestType {
     EXPENSE,
     ASSET_REQUEST,
     WORK_FROM_HOME,
-    OVERTIME
+    OVERTIME,
+    /** Missed or wrong check-in/out; the details say which day and times to fix. */
+    ATTENDANCE_CORRECTION
 }

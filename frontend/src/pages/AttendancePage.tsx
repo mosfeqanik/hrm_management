@@ -85,7 +85,7 @@ export default function AttendancePage() {
             {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
 
             <div className="table-responsive">
-              <table className="table table-hover align-middle">
+              <table className="table table-hover align-middle mh-stack">
                 <thead>
                   <tr>
                     {COLUMNS.map((h, i) => (
@@ -112,21 +112,21 @@ export default function AttendancePage() {
                   )}
                   {rows.map((a) => (
                     <tr key={a.id}>
-                      <td>{a.workDate}</td>
-                      <td className="font-weight-medium text-dark">{nameOf(a.employeeId)}</td>
-                      <td>{time(a.checkInAt)}</td>
-                      <td>{time(a.checkOutAt)}</td>
-                      <td>{hm(a.workedMinutes)}</td>
-                      <td>{a.lateMinutes > 0 ? `${a.lateMinutes} min` : '-'}</td>
-                      <td>
+                      <td data-label={COLUMNS[0]}>{a.workDate}</td>
+                      <td data-label={COLUMNS[1]} className="font-weight-medium text-dark">{nameOf(a.employeeId)}</td>
+                      <td data-label={COLUMNS[2]}>{time(a.checkInAt)}</td>
+                      <td data-label={COLUMNS[3]}>{time(a.checkOutAt)}</td>
+                      <td data-label={COLUMNS[4]}>{hm(a.workedMinutes)}</td>
+                      <td data-label={COLUMNS[5]}>{a.lateMinutes > 0 ? `${a.lateMinutes} min` : '-'}</td>
+                      <td data-label={COLUMNS[6]}>
                         {a.status ? (
                           <span className={`badge ${STATUS_BADGE[a.status]}`}>{a.status.replace('_', ' ')}</span>
                         ) : (
                           '-'
                         )}
                       </td>
-                      <td>{a.method?.replace('_', ' ') ?? '-'}</td>
-                      <td className="text-end text-nowrap">
+                      <td data-label={COLUMNS[7]}>{a.method?.replace('_', ' ') ?? '-'}</td>
+                      <td data-label={COLUMNS[8]} className="text-end text-nowrap">
                         <Can permission="ATTENDANCE_MANAGE">
                           <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(a)}>
                             Edit

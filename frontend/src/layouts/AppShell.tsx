@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   Briefcase,
@@ -82,13 +82,33 @@ function OrgRequired() {
   )
 }
 
+/** Matches Bootstrap's "below lg" (< 992 px), where the template shows the ☰ toggler. */
+function useIsSmallScreen() {
+  const query = '(max-width: 991.98px)'
+  const [small, setSmall] = useState(() => window.matchMedia(query).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(query)
+    const onChange = () => setSmall(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return small
+}
+
 export function AppShell() {
   const { session, signOut, can, isPlatform, orgId } = useAuth()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false) // mobile only
+  const small = useIsSmallScreen()
   const [navOpen, setNavOpen] = useState(false) // mobile topbar collapse
   const [userMenu, setUserMenu] = useState(false)
   const isSuperAdmin = session?.userType === 'SUPER_ADMIN'
+
+  // Close the slide-in menus after navigating, and when the screen grows past the phone/tablet size.
+  useEffect(() => {
+    setSidebarOpen(false)
+    setNavOpen(false)
+  }, [location.pathname, small])
   const isActive = (to: string) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to))
 
   // The organization's plan decides which feature modules show. A platform user without an
@@ -143,7 +163,9 @@ export function AppShell() {
       data-theme="light"
       data-layout="vertical"
       data-navbarbg="skin6"
-      data-sidebartype="full"
+      // The template hides the sidebar only in "mini-sidebar" mode (its own jQuery script switched it;
+      // we do not load that script), so pick the mode here. Below lg the ☰ button slides it in.
+      data-sidebartype={small ? 'mini-sidebar' : 'full'}
       data-sidebar-position="fixed"
       data-header-position="fixed"
       data-boxed-layout="full"
@@ -192,6 +214,8 @@ export function AppShell() {
           </div>
         </nav>
       </header>
+
+      {small && sidebarOpen && <div className="mh-sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
 
       <aside className="left-sidebar" data-sidebarbg="skin6">
         <div className="scroll-sidebar" data-sidebarbg="skin6">

@@ -39,12 +39,11 @@ export default function EmployeesPage() {
       <div className="container-fluid">
         <div className="card">
           <div className="card-body">
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
               <h4 className="card-title mb-0">All employees</h4>
               <input
                 type="search"
-                className="form-control w-auto"
-                style={{ minWidth: 260 }}
+                className="form-control w-auto mh-search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search name, code, email, position..."
@@ -55,7 +54,7 @@ export default function EmployeesPage() {
             {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
 
             <div className="table-responsive">
-              <table className="table table-hover align-middle">
+              <table className="table table-hover align-middle mh-stack">
                 <thead>
                   <tr>
                     {COLUMNS.map((h, i) => (
@@ -82,17 +81,17 @@ export default function EmployeesPage() {
                   )}
                   {rows.map((e) => (
                     <tr key={e.id}>
-                      <td>{e.employeeCode}</td>
-                      <td className="font-weight-medium text-dark">{e.fullName}</td>
-                      <td>{e.email ?? '-'}</td>
-                      <td>{e.position ?? '-'}</td>
-                      <td>{e.employmentType?.replace('_', ' ') ?? '-'}</td>
-                      <td>
+                      <td data-label={COLUMNS[0]}>{e.employeeCode}</td>
+                      <td data-label={COLUMNS[1]} className="font-weight-medium text-dark">{e.fullName}</td>
+                      <td data-label={COLUMNS[2]}>{e.email ?? '-'}</td>
+                      <td data-label={COLUMNS[3]}>{e.position ?? '-'}</td>
+                      <td data-label={COLUMNS[4]}>{e.employmentType?.replace('_', ' ') ?? '-'}</td>
+                      <td data-label={COLUMNS[5]}>
                         <span className={`badge ${e.active ? 'bg-success' : 'bg-secondary'}`}>
                           {e.active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="text-end text-nowrap">
+                      <td data-label={COLUMNS[6]} className="text-end text-nowrap">
                         <Can permission="EMPLOYEE_UPDATE">
                           <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(e)}>
                             Edit

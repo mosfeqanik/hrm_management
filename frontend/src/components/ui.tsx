@@ -106,7 +106,7 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
     <>
       <div className="modal-backdrop fade show" />
       <div className="modal fade show d-block" tabIndex={-1} role="dialog" aria-modal="true" onClick={onClose}>
-        <div className="modal-dialog modal-dialog-scrollable modal-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-dialog modal-dialog-scrollable modal-lg modal-fullscreen-sm-down" onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">{title}</h5>
@@ -206,7 +206,7 @@ export function DataTable<T extends { id: number }>({
 
   const table = (
     <div className="table-responsive">
-      <table className={`table align-middle ${datatable ? 'border table-striped table-hover mh-datatable' : 'table-hover'}`}>
+      <table className={`table align-middle mh-stack ${datatable ? 'border table-striped table-hover mh-datatable' : 'table-hover'}`}>
         <thead>
           <tr>
             {columns.map((c, i) => {
@@ -244,7 +244,7 @@ export function DataTable<T extends { id: number }>({
           {visible.map((r) => (
             <tr key={r.id}>
               {columns.map((c, i) => (
-                <td key={i} className={c.className}>
+                <td key={i} className={c.className} data-label={c.header}>
                   {c.cell(r)}
                 </td>
               ))}
@@ -344,7 +344,7 @@ export function Tabs<K extends string>({
   onChange: (key: K) => void
 }) {
   return (
-    <ul className="nav nav-tabs mb-3">
+    <ul className="nav nav-tabs mb-3 mh-tabs">
       {tabs.map((t) => (
         <li key={t.key} className="nav-item">
           <a
@@ -382,7 +382,7 @@ export function PageHeader({ title, trail = [], actions }: { title: string; trai
   return (
     <div className="page-breadcrumb">
       <div className="row">
-        <div className="col-7 align-self-center">
+        <div className="col-12 col-md-7 align-self-center">
           <h4 className="page-title text-truncate text-dark font-weight-medium mb-1">{title}</h4>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb m-0 p-0">
@@ -395,8 +395,8 @@ export function PageHeader({ title, trail = [], actions }: { title: string; trai
             </ol>
           </nav>
         </div>
-        <div className="col-5 align-self-center">
-          <div className="float-end">{actions}</div>
+        <div className="col-12 col-md-5 align-self-center">
+          <div className="mh-page-actions">{actions}</div>
         </div>
       </div>
     </div>

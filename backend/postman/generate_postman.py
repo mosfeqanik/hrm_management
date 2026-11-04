@@ -185,7 +185,33 @@ def build():
     return folders, count
 
 
+# QA accounts seeded by scripts/api_e2e_test.py (docs/QA_CREDENTIALS.md). Test data only.
+QA_LOGINS = [
+    ("QA owner (ORG_OWNER)", "qa.owner@mindhr.test"),
+    ("QA team lead (TEAM_LEAD)", "qa.lead@mindhr.test"),
+    ("QA employee 1 (EMPLOYEE)", "qa.emp1@mindhr.test"),
+    ("QA employee 2 (EMPLOYEE)", "qa.emp2@mindhr.test"),
+]
+
+
+def qa_folder():
+    items = []
+    for name, email in QA_LOGINS:
+        items.append({"name": f"Login as {name}", "request": {
+            "method": "POST", "auth": {"type": "noauth"},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"]},
+            "body": {"mode": "raw", "raw": json.dumps({"email": email, "password": "QaTest@123"}, indent=2),
+                     "options": {"raw": {"language": "json"}}},
+            "description": "QA test account. Copy `accessToken` from the response into the collection variable `token`.",
+        }})
+    return {"name": "QA logins", "description": "Test accounts from docs/QA_CREDENTIALS.md (password QaTest@123).",
+            "item": items}
+
+
 folders, count = build()
+folders.insert(0, qa_folder())
+count += len(QA_LOGINS)
 collection = {
     "info": {
         "name": "mindHR API",

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -66,6 +67,12 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .orElse("Validation failed");
         return errorBody(HttpStatus.BAD_REQUEST, message);
+    }
+
+    /** Malformed JSON or an unknown enum value (e.g. a request type that does not exist). */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadable(HttpMessageNotReadableException ex) {
+        return errorBody(HttpStatus.BAD_REQUEST, "Request body is invalid: check the JSON and the allowed values");
     }
 
     private ResponseEntity<Map<String, Object>> errorBody(HttpStatus status, String message) {

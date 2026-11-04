@@ -41,7 +41,7 @@ export default function DepartmentsPage() {
             {error && <ErrorBox message={errorMessage(error)} />}
             {remove.error && <ErrorBox message={errorMessage(remove.error)} />}
             <div className="table-responsive">
-              <table className="table table-hover align-middle">
+              <table className="table table-hover align-middle mh-stack">
                 <thead>
                   <tr>
                     {COLUMNS.map((h, i) => (
@@ -68,15 +68,15 @@ export default function DepartmentsPage() {
                   )}
                   {rows.map((d) => (
                     <tr key={d.id}>
-                      <td className="font-weight-medium text-dark">{d.name}</td>
-                      <td>{branches.nameOf(d.branchId)}</td>
-                      <td>{employees.nameOf(d.headId)}</td>
-                      <td>
+                      <td data-label={COLUMNS[0]} className="font-weight-medium text-dark">{d.name}</td>
+                      <td data-label={COLUMNS[1]}>{branches.nameOf(d.branchId)}</td>
+                      <td data-label={COLUMNS[2]}>{employees.nameOf(d.headId)}</td>
+                      <td data-label={COLUMNS[3]}>
                         <span className={`badge ${d.active ? 'bg-success' : 'bg-secondary'}`}>
                           {d.active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="text-end text-nowrap">
+                      <td data-label={COLUMNS[4]} className="text-end text-nowrap">
                         <Can permission="DEPARTMENT_UPDATE">
                           <Button variant="secondary" size="sm" className="me-2" onClick={() => setEditing(d)}>
                             Edit

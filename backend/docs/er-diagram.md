@@ -303,6 +303,262 @@ erDiagram
     USERS           ||--o{ NOTIFICATIONS : ""
 ```
 
+## HR (workforce) tables
+
+The organization-side HR layer. Generated from the entities (`Branch` ... `AssetAssignment`); every table also has
+`created_at` and `updated_at`, and every `organization_id` points to `ORGANIZATIONS` (left out to keep the diagram
+readable). `ROLES` also has `data_scope` (`PLATFORM | ORGANIZATION | BRANCH | TEAM | SELF`), which decides which
+employees' rows a role may see.
+
+```mermaid
+erDiagram
+    ASSETS ||--o{ ASSET_ASSIGNMENTS : "asset"
+    BRANCHES |o--o{ DEPARTMENTS : "branch"
+    BRANCHES |o--o{ EMPLOYEES : "branch"
+    BRANCHES |o--o{ PAYROLL_RUNS : "branch"
+    DEPARTMENTS |o--o{ EMPLOYEES : "department"
+    EMPLOYEES |o--o{ BRANCHES : "manager"
+    EMPLOYEES |o--o{ DEPARTMENTS : "head"
+    EMPLOYEES |o--o{ EMPLOYEES : "manager"
+    EMPLOYEES |o--o{ LEAVE_REQUESTS : "decidedBy"
+    EMPLOYEES |o--o{ WORK_REQUESTS : "decidedBy"
+    EMPLOYEES ||--o{ ASSET_ASSIGNMENTS : "employee"
+    EMPLOYEES ||--o{ ATTENDANCE_RECORDS : "employee"
+    EMPLOYEES ||--o{ EMPLOYEE_DOCUMENTS : "employee"
+    EMPLOYEES ||--o{ EMPLOYEE_EVENTS : "employee"
+    EMPLOYEES ||--o{ EMPLOYEE_PAYMENT_ACCOUNTS : "employee"
+    EMPLOYEES ||--o{ LEAVE_BALANCES : "employee"
+    EMPLOYEES ||--o{ LEAVE_REQUESTS : "employee"
+    EMPLOYEES ||--o{ PAYSLIPS : "employee"
+    EMPLOYEES ||--o{ SALARY_STRUCTURES : "employee"
+    EMPLOYEES ||--o{ SHIFT_ASSIGNMENTS : "employee"
+    EMPLOYEES ||--o{ WORK_REQUESTS : "employee"
+    LEAVE_TYPES ||--o{ LEAVE_BALANCES : "leaveType"
+    LEAVE_TYPES ||--o{ LEAVE_REQUESTS : "leaveType"
+    PAYROLL_RUNS ||--o{ PAYSLIPS : "payrollRun"
+    SHIFTS |o--o{ SHIFT_ASSIGNMENTS : "shift"
+    USERS |o--o| EMPLOYEES : "user"
+
+    BRANCHES {
+        bigint id PK
+        bigint organization_id FK
+        string name
+        string code
+        string address
+        string phone
+        bigint manager_id FK
+        boolean active
+        double latitude
+        double longitude
+        int geofence_radius_m
+    }
+    DEPARTMENTS {
+        bigint id PK
+        bigint organization_id FK
+        string name
+        bigint branch_id FK
+        bigint head_id FK
+        boolean active
+    }
+    EMPLOYEES {
+        bigint id PK
+        bigint organization_id FK
+        bigint user_id FK
+        string employee_code
+        string full_name
+        string email
+        string phone
+        string position
+        string national_id_serial
+        string photo_url
+        string address
+        string emergency_contact_name
+        string emergency_contact_phone
+        string emergency_contact_relation
+        bigint branch_id FK
+        bigint department_id FK
+        bigint manager_id FK
+        enum employment_type
+        date joined_at
+        boolean active
+    }
+    EMPLOYEE_PAYMENT_ACCOUNTS {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        enum account_type
+        string provider
+        string account_name
+        string account_number
+        boolean is_primary
+    }
+    SALARY_STRUCTURES {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        date effective_from
+        decimal basic_salary
+        decimal allowances
+        string currency
+    }
+    EMPLOYEE_EVENTS {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        enum event_type
+        date event_date
+        string title
+        string details
+        string old_value
+        string new_value
+    }
+    EMPLOYEE_DOCUMENTS {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        enum document_type
+        string title
+        string file_url
+        date issued_at
+        string note
+    }
+    SHIFTS {
+        bigint id PK
+        bigint organization_id FK
+        string name
+        time start_time
+        time end_time
+        boolean active
+    }
+    SHIFT_ASSIGNMENTS {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        bigint shift_id FK
+        date work_date
+    }
+    ATTENDANCE_RECORDS {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        date work_date
+        timestamp check_in_at
+        timestamp check_out_at
+        double check_in_latitude
+        double check_in_longitude
+        double check_out_latitude
+        double check_out_longitude
+        enum check_method
+        enum status
+        int late_minutes
+        int worked_minutes
+        string note
+    }
+    LEAVE_TYPES {
+        bigint id PK
+        bigint organization_id FK
+        string name
+        int annual_days
+        boolean is_paid
+        boolean active
+    }
+    LEAVE_BALANCES {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        bigint leave_type_id FK
+        int leave_year
+        decimal entitled_days
+        decimal used_days
+    }
+    LEAVE_REQUESTS {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        bigint leave_type_id FK
+        date from_date
+        date to_date
+        decimal days
+        string reason
+        enum status
+        bigint decided_by_id FK
+        timestamp decided_at
+        string decision_note
+    }
+    WORK_REQUESTS {
+        bigint id PK
+        bigint organization_id FK
+        bigint employee_id FK
+        enum request_type
+        string title
+        string details
+        decimal amount
+        date request_date
+        enum status
+        bigint decided_by_id FK
+        timestamp decided_at
+        string decision_note
+    }
+    PAYROLL_RUNS {
+        bigint id PK
+        bigint organization_id FK
+        int run_year
+        int run_month
+        bigint branch_id FK
+        enum status
+        string note
+    }
+    PAYSLIPS {
+        bigint id PK
+        bigint organization_id FK
+        bigint payroll_run_id FK
+        bigint employee_id FK
+        decimal basic_salary
+        decimal allowances
+        decimal overtime
+        decimal bonus
+        decimal commission
+        decimal gross_salary
+        decimal late_deduction
+        decimal absent_deduction
+        decimal loan_deduction
+        decimal advance_deduction
+        decimal net_salary
+        int days_present
+        int days_absent
+        int days_late
+        enum status
+    }
+    ASSETS {
+        bigint id PK
+        bigint organization_id FK
+        string name
+        string asset_tag
+        string serial_number
+        string category
+        string description
+        enum status
+    }
+    ASSET_ASSIGNMENTS {
+        bigint id PK
+        bigint organization_id FK
+        bigint asset_id FK
+        bigint employee_id FK
+        date assigned_at
+        date returned_at
+        string condition_note
+    }
+```
+
+Notes:
+- `EMPLOYEES.user_id` is the employee's login (`USERS`); employees created through the API always get one.
+- `EMPLOYEES.manager_id` (self-reference) defines a Team Lead's team; `BRANCHES.manager_id` and `DEPARTMENTS.head_id`
+  are informational.
+- `LEAVE_REQUESTS.decided_by_id` / `WORK_REQUESTS.decided_by_id` are the approving employee.
+- `ATTENDANCE_RECORDS` has one row per employee per `work_date`; approved leave writes `status = ON_LEAVE` rows.
+- `LEAVE_BALANCES` is unique per employee, leave type and `leave_year`; it is created from `LEAVE_TYPES.annual_days`
+  on the first application if HR did not add it.
+
 ## Reading the diagram
 
 | Notation | Meaning |

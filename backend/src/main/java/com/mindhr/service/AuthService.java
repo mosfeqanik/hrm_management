@@ -1,13 +1,16 @@
 package com.mindhr.service;
 
 import com.mindhr.config.JwtProperties;
+import com.mindhr.dto.ChangePasswordRequest;
 import com.mindhr.dto.LoginRequest;
 import com.mindhr.dto.LoginResponse;
 import com.mindhr.entity.User;
+import com.mindhr.exception.ResourceNotFoundException;
 import com.mindhr.repository.EmployeeRepository;
 import com.mindhr.repository.UserRepository;
 import com.mindhr.security.CustomUserDetails;
 import com.mindhr.security.JwtService;
+import com.mindhr.security.TenantContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -55,5 +58,20 @@ public class AuthService {
                 user.getFullName(),
                 user.getUserType().name()
         );
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        Long userId = TenantContext.currentPrincipal().userId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+        if (request.currentPassword().equals(request.newPassword())) {
+            throw new IllegalArgumentException("New password must be different from the current password");
+        }
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
     }
 }
